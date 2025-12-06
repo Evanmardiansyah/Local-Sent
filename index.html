@@ -1,174 +1,185 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvanShare Secure</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>EvanShare - Bulma Edition</title>
     
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
     <style>
-        :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #3b82f6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --text: #f1f5f9;
-            --muted: #94a3b8;
-        }
-
+        /* Custom CSS untuk mempercantik Bulma */
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
-            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
         }
 
-        .container {
-            background-color: var(--card);
-            width: 90%;
-            max-width: 450px;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            text-align: center;
-        }
-
-        h2 { margin: 0 0 5px 0; color: var(--primary); }
-        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
-
-        /* ID & PIN BOX */
-        .info-box {
-            background: #0f172a;
-            border: 1px border #334155;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .info-label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 5px;}
-        .info-value { font-size: 1.2rem; font-weight: bold; color: var(--success); letter-spacing: 1px; }
-        .pin-display { float: right; color: var(--primary); font-family: monospace; cursor: pointer;}
-
-        /* Inputs */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        input {
+        /* Agar card tidak terlalu lebar di Desktop, tapi full di HP */
+        .main-card {
+            max-width: 480px;
             width: 100%;
-            padding: 12px;
-            background: #334155;
-            border: 1px solid #475569;
-            color: white;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Terminal Style Log */
+        .terminal-log {
+            background-color: #0a0a0a;
+            color: #00d1b2; /* Bulma Primary Color */
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            padding: 1rem;
             border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            margin-top: 5px;
-        }
-        input:focus { outline: 2px solid var(--primary); }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.2s;
-            color: white;
-        }
-        .btn-primary { background: var(--primary); }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-danger { background: var(--danger); margin-top: 10px; }
-
-        /* Log & Status */
-        #status { font-weight: bold; margin: 15px 0; font-size: 0.9rem; }
-        .log-area {
-            background: #000;
-            height: 120px;
+            height: 150px;
             overflow-y: auto;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: left;
-            font-family: monospace;
-            font-size: 0.8rem;
-            margin-top: 15px;
-            border: 1px solid #334155;
+            border: 1px solid #333;
+            margin-top: 1.5rem;
         }
-        .hidden { display: none; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #1f1f1f; padding-bottom: 2px; }
+
+        /* Floating Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 99;
+        }
+
+        /* Animasi Transisi Halaman */
+        .fade-in { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2><i class="fas fa-network-wired"></i> EvanShare Secure</h2>
-    <p class="subtitle">Transfer P2P dengan PIN Keamanan</p>
+    <button class="button is-rounded is-small theme-toggle" onclick="toggleTheme()">
+        <span class="icon"><i class="fas fa-adjust"></i></span>
+        <span>Tema</span>
+    </button>
 
-    <div id="status" style="color: var(--muted);">Menyiapkan ID...</div>
+    <section class="section" style="width: 100%; padding: 1.5rem;">
+        <div class="container">
+            
+            <div class="box main-card fade-in">
+                <div class="has-text-centered mb-5">
+                    <h1 class="title is-4 has-text-primary">
+                        <i class="fas fa-paper-plane"></i> EvanShare
+                    </h1>
+                    <p class="subtitle is-7">Secure P2P Transfer • Bulma UI</p>
+                </div>
 
-    <div id="page-home">
-        <div class="info-box">
-            <span class="info-label">ID Perangkat Ini:</span>
-            <div class="info-value" id="my-id">...</div>
-            <hr style="border-color: #334155; opacity: 0.3; margin: 10px 0;">
-            <span class="info-label">PIN Keamanan Saya:</span>
-            <input type="number" id="my-pin" value="1234" style="width: 80px; padding: 5px; text-align: center;">
-            <small style="color: var(--muted); font-size: 0.7rem;">(Teman harus isi PIN ini untuk konek)</small>
+                <div id="status-notification" class="notification is-warning is-light p-2 mb-4 has-text-centered is-size-7">
+                    <span class="icon"><i class="fas fa-spinner fa-spin"></i></span>
+                    <span id="status-text">Menghubungkan ke jaringan...</span>
+                </div>
+
+                <div id="page-home">
+                    <div class="field is-grouped is-grouped-multiline mb-5" style="background: var(--bulma-background-weak); padding: 15px; border-radius: 8px;">
+                        <div class="control is-expanded">
+                            <label class="label is-small">ID Saya</label>
+                            <div class="tags has-addons">
+                                <span class="tag is-medium is-primary" id="my-id">...</span>
+                                <a class="tag is-medium is-dark" onclick="copyId()"><i class="far fa-copy"></i></a>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label class="label is-small">PIN Keamanan</label>
+                            <input class="input is-small has-text-centered" type="number" id="my-pin" value="1234" style="width: 80px;">
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">ID Teman</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="text" id="target-id" placeholder="Contoh: PC-Tiger-88">
+                            <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="label is-small">PIN Teman</label>
+                        <div class="control has-icons-left">
+                            <input class="input" type="number" id="target-pin" placeholder="Default: 1234">
+                            <span class="icon is-small is-left"><i class="fas fa-key"></i></span>
+                        </div>
+                    </div>
+
+                    <button class="button is-primary is-fullwidth is-medium mt-4" onclick="initiateConnection()">
+                        <span class="icon"><i class="fas fa-link"></i></span>
+                        <span>Sambungkan Aman</span>
+                    </button>
+                </div>
+
+                <div id="page-transfer" class="is-hidden fade-in">
+                    <div class="notification is-success is-light has-text-centered">
+                        <i class="fas fa-check-circle"></i> <b>Terhubung!</b><br>
+                        <small>Koneksi terenkripsi & terverifikasi.</small>
+                    </div>
+
+                    <div class="file is-boxed is-primary is-centered has-name is-fullwidth mt-5">
+                        <label class="file-label">
+                            <input class="file-input" type="file" id="file-input" onchange="handleFileSelect()">
+                            <span class="file-cta">
+                                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                <span class="file-label">Pilih File...</span>
+                            </span>
+                            <span class="file-name has-text-centered" id="file-name-display">
+                                Belum ada file dipilih
+                            </span>
+                        </label>
+                    </div>
+
+                    <button class="button is-primary is-fullwidth mt-3" onclick="triggerSend()">
+                        Kirim File
+                    </button>
+                    
+                    <button class="button is-danger is-light is-fullwidth mt-3" onclick="location.reload()">
+                        Putuskan Koneksi
+                    </button>
+                </div>
+
+                <div class="terminal-log" id="log-box">
+                    <div class="log-entry">> System initialized...</div>
+                    <div class="log-entry">> Bulma UI loaded.</div>
+                </div>
+
+            </div>
+            
+            <p class="has-text-centered is-size-7 mt-3 has-text-grey">
+                &copy; 2024 EvanShare | Powered by Bulma CSS
+            </p>
         </div>
-
-        <div class="input-group">
-            <label class="info-label">ID Teman (Tujuan)</label>
-            <input type="text" id="target-id" placeholder="Contoh: PC-Tiger-88">
-        </div>
-        <div class="input-group">
-            <label class="info-label">PIN Teman</label>
-            <input type="number" id="target-pin" placeholder="Masukkan PIN teman (Default: 1234)">
-        </div>
-        
-        <button class="btn btn-primary" onclick="initiateConnection()">
-            <i class="fas fa-lock"></i> Sambungkan Aman
-        </button>
-    </div>
-
-    <div id="page-transfer" class="hidden">
-        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; border: 1px solid var(--success);">
-            <i class="fas fa-shield-alt" style="color: var(--success);"></i> Koneksi Terverifikasi!
-        </div>
-        
-        <br>
-        <input type="file" id="file-input" class="hidden" onchange="handleFileSelect()">
-        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
-            <i class="fas fa-file-export"></i> Pilih File
-        </button>
-        <div id="file-name-display" style="margin-top:10px; color:#ccc; font-size:0.9rem;"></div>
-
-        <button class="btn btn-danger" onclick="location.reload()">Putuskan</button>
-    </div>
-
-    <div class="log-area" id="log-box">
-        <div>> System Ready.</div>
-    </div>
-</div>
+    </section>
 
 <script>
-    // --- 1. CONFIG & RANDOM NAME GENERATOR ---
-    // Nama random biar keren: PC-Lion-99
-    const devices = ["PC", "Laptop", "HP", "Tab"];
-    const animals = ["Tiger", "Lion", "Eagle", "Shark", "Wolf", "Bear"];
+    // --- 1. DARK MODE TOGGLE ---
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+    }
+
+    // --- 2. CONFIG & ID GENERATOR ---
+    const devices = ["PC", "Laptop", "Android", "iPhone"];
+    const animals = ["Tiger", "Lion", "Eagle", "Shark", "Wolf"];
     
     function generateId() {
         const dev = devices[Math.floor(Math.random() * devices.length)];
         const ani = animals[Math.floor(Math.random() * animals.length)];
-        const num = Math.floor(10 + Math.random() * 90); // 10-99
+        const num = Math.floor(10 + Math.random() * 90);
         return `${dev}-${ani}-${num}`;
     }
 
     const myId = generateId();
+    // Config STUN Google (Standard)
     const peerConfig = {
         debug: 1,
         config: { 'iceServers': [{ url: 'stun:stun.l.google.com:19302' }] }
@@ -178,138 +189,150 @@
     let conn = null;
     let isAuthenticated = false;
 
-    // --- 2. PEER EVENTS ---
-    
+    // --- 3. PEER EVENTS ---
     peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
-        setStatus("Online. Menunggu koneksi...", "#10b981");
+        updateStatus("Siap. Menunggu koneksi...", "is-info");
     });
 
     peer.on('error', (err) => {
-        log("Error: " + err.type);
-        if(err.type === 'unavailable-id') alert("ID tabrakan, refresh halaman!");
-        else setStatus("Koneksi Error. Cek Jaringan.", "#ef4444");
+        console.error(err);
+        if(err.type === 'unavailable-id') {
+            alert("ID Tabrakan, refresh halaman.");
+            location.reload();
+        } else if (err.type === 'network' || err.type === 'peer-unavailable') {
+            updateStatus("Gagal Konek (Blokir Jaringan/Firewall)", "is-danger");
+            log("ERROR: Firewall Kantor memblokir PeerJS.", true);
+        }
     });
 
-    // --- 3. LOGIKA PENERIMA (SERVER SIDE LOGIC) ---
-    // Saat ada orang asing mau masuk
+    // --- 4. PENERIMA (SERVER) ---
     peer.on('connection', (c) => {
         conn = c;
-        
-        // Jangan langsung terima! Tunggu dia kirim PIN dulu.
-        log(`Ada permintaan koneksi dari ${conn.peer}...`);
-        setStatus("Memverifikasi PIN pengirim...", "#facc15");
+        log(`Incoming connection from ${conn.peer}...`);
+        updateStatus("Memverifikasi PIN Pengirim...", "is-warning");
 
         conn.on('data', (data) => {
-            // A. Fase Handshake (Cek PIN)
+            // A. Cek PIN
             if (data.type === 'auth-request') {
                 const myPin = document.getElementById('my-pin').value;
                 if (data.pin === myPin) {
-                    log("PIN Benar! Koneksi diterima.");
+                    log("PIN Match! Access Granted.");
                     conn.send({ type: 'auth-response', status: 'success' });
                     isAuthenticated = true;
                     showTransferPage();
                 } else {
-                    log("PIN SALAH! Menolak koneksi.");
+                    log("PIN Salah! Access Denied.", true);
                     conn.send({ type: 'auth-response', status: 'fail' });
-                    setTimeout(() => conn.close(), 500); // Tendang user
+                    setTimeout(() => conn.close(), 1000);
                 }
             }
-            
-            // B. Fase Terima File (Hanya jika sudah Authenticated)
+            // B. Terima File
             else if (data.type === 'file' && isAuthenticated) {
                 log(`Menerima file: ${data.filename}`);
                 const blob = new Blob([data.file], { type: data.filetype });
                 const url = URL.createObjectURL(blob);
-                logHTML(`<a href="${url}" download="${data.filename}" style="color:yellow; text-decoration:none;">[DOWNLOAD ${data.filename}]</a>`);
+                
+                // Buat tombol download cantik
+                const dlButton = `<a href="${url}" download="${data.filename}" style="color:#48c774; text-decoration:none; font-weight:bold;">[DOWNLOAD: ${data.filename}]</a>`;
+                log(dlButton, true);
             }
         });
 
-        conn.on('close', () => {
-            alert("Koneksi terputus.");
-            location.reload();
-        });
+        conn.on('close', () => { alert("Koneksi Putus!"); location.reload(); });
     });
 
-    // --- 4. LOGIKA PENGIRIM (CLIENT SIDE LOGIC) ---
+    // --- 5. PENGIRIM (CLIENT) ---
     function initiateConnection() {
         const targetId = document.getElementById('target-id').value.trim();
         const targetPin = document.getElementById('target-pin').value.trim();
 
-        if(!targetId || !targetPin) return alert("ID dan PIN tidak boleh kosong!");
+        if(!targetId || !targetPin) return alert("Isi ID dan PIN dulu!");
 
-        setStatus(`Menghubungi ${targetId}...`, "#facc15");
+        updateStatus(`Menghubungi ${targetId}...`, "is-warning");
         conn = peer.connect(targetId);
 
         conn.on('open', () => {
-            log("Terhubung ke server peer. Mengirim PIN...");
-            // Kirim PIN untuk diverifikasi
+            log("Connected. Sending PIN...");
             conn.send({ type: 'auth-request', pin: targetPin });
         });
 
         conn.on('data', (data) => {
             if (data.type === 'auth-response') {
                 if (data.status === 'success') {
-                    log("PIN Diterima! Koneksi Aman.");
                     isAuthenticated = true;
                     showTransferPage();
                 } else {
-                    alert("PIN SALAH! Koneksi ditolak oleh penerima.");
+                    alert("PIN SALAH! Koneksi ditolak.");
                     conn.close();
                 }
             }
         });
-
-        conn.on('error', (err) => log("Koneksi error: " + err));
+        
+        conn.on('error', (err) => { updateStatus("Gagal Konek.", "is-danger"); });
     }
 
-    // --- 5. TRANSFER FILE ---
+    // --- 6. FUNGSI TRANSFER ---
     function handleFileSelect() {
         const file = document.getElementById('file-input').files[0];
-        if (file) {
-            document.getElementById('file-name-display').innerText = "Siap kirim: " + file.name;
-            sendFile(file);
-        }
+        if(file) document.getElementById('file-name-display').innerText = file.name;
     }
 
-    function sendFile(file) {
-        if(!conn || !isAuthenticated) return alert("Belum konek aman!");
+    function triggerSend() {
+        const file = document.getElementById('file-input').files[0];
+        if (!file) return alert("Pilih file dulu!");
+        if (!conn || !isAuthenticated) return alert("Belum konek!");
+
+        log(`Mengirim: ${file.name} (${formatBytes(file.size)})...`);
         
-        log(`Mengirim ${file.name}...`);
         conn.send({
             type: 'file',
             file: file,
             filename: file.name,
             filetype: file.type
         });
-        log("File terkirim!");
+        log("File Terkirim!");
     }
 
-    // --- UTILS ---
+    // --- UTILITIES ---
     function showTransferPage() {
-        document.getElementById('page-home').classList.add('hidden');
-        document.getElementById('page-transfer').classList.remove('hidden');
-        setStatus("Terhubung Aman (Encrypted)", "#10b981");
+        document.getElementById('page-home').classList.add('is-hidden');
+        document.getElementById('page-transfer').classList.remove('is-hidden');
+        updateStatus("Terhubung Aman.", "is-success");
     }
 
-    function setStatus(msg, color) {
-        const el = document.getElementById('status');
-        el.innerText = msg;
-        el.style.color = color;
+    function updateStatus(msg, type) {
+        const el = document.getElementById('status-notification');
+        const txt = document.getElementById('status-text');
+        
+        // Reset class color
+        el.className = `notification p-2 mb-4 has-text-centered is-size-7 ${type}`;
+        if(type === 'is-warning') el.classList.add('is-light');
+        
+        txt.innerText = msg;
     }
 
-    function log(msg) {
+    function log(msg, isHtml = false) {
         const box = document.getElementById('log-box');
-        const d = document.createElement('div');
-        d.innerText = "> " + msg;
-        box.prepend(d);
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        if(isHtml) div.innerHTML = "> " + msg;
+        else div.innerText = "> " + msg;
+        box.prepend(div);
     }
-    
-    function logHTML(html) {
-        const box = document.getElementById('log-box');
-        const d = document.createElement('div');
-        d.innerHTML = "> " + html;
-        box.prepend(d);
+
+    function copyId() {
+        navigator.clipboard.writeText(document.getElementById('my-id').innerText);
+        alert("ID Disalin!");
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (!+bytes) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
     }
 </script>
 
