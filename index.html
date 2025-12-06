@@ -1,49 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Web LocalSend KW</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalSent Web - Evan</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-</head>
-<body style="background-color: #1e1e1e; color: white; font-family: sans-serif; text-align: center; padding: 50px;">
-
-    <h2>FH Local Share</h2>
-    <p>ID Kamu: <b id="my-id" style="color: cyan;">...loading...</b></p>
-    
-    <hr style="border-color: #333;">
-
-    <input type="text" id="friend-id" placeholder="Masukkan ID Teman" style="padding: 10px;">
-    <button onclick="connectToFriend()" style="padding: 10px;">Konek</button>
-
-    <div id="status" style="margin-top: 20px;">Menunggu koneksi...</div>
-
-    <script>
-        // 1. Minta ID ke Server PeerJS (Gratis & Public)
-        // Kita tidak perlu bikin server sendiri!
-        var peer = new Peer(); 
-
-        peer.on('open', function(id) {
-            document.getElementById('my-id').innerText = id;
-        });
-
-        // 2. Kalau ada yang mau konek ke kita
-        peer.on('connection', function(conn) {
-            conn.on('data', function(data) {
-                document.getElementById('status').innerText = "Teman bilang: " + data;
-                alert("Pesan masuk: " + data);
-            });
-        });
-
-        // 3. Fungsi konek ke teman
-        function connectToFriend() {
-            var friendId = document.getElementById('friend-id').value;
-            var conn = peer.connect(friendId);
-            
-            conn.on('open', function() {
-                // Kirim pesan test
-                conn.send('Halo! Kita sudah terhubung lewat fh.evan-cloud.my.id');
-                document.getElementById('status').innerText = "Terhubung! Pesan terkirim.";
-            });
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-    </script>
+        .card {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 { margin-top: 0; color: #4db6ac; }
+        .box {
+            background: #2c2c2c;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            word-break: break-all;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            box-sizing: border-box;
+        }
+        input { background: #333; color: white; border: 1px solid #444; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-connect { background-color: #00897b; color: white; }
+        .btn-connect:hover { background-color: #00695c; }
+        .btn-file { background-color: #424242; color: white; display: none; }
+        
+        #status { font-size: 0.9em; color: #aaa; margin-bottom: 10px; }
+        .log { text-align: left; font-size: 0.85em; max-height: 150px; overflow-y: auto; background: #000; padding: 10px; margin-top: 15px; border-radius: 5px; }
+        .success { color: #69f0ae; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>LocalSent Web</h1>
+    <div id="status">Menghubungkan ke server...</div>
+
+    <div class="box">
+        <small>ID Kamu:</small><br>
+        <b id="my-id" style="font-size: 1.2em; color: #80cbc4;">...</b>
+    </div>
+
+    <div id="connect-area">
+        <input type="text" id="friend-id" placeholder="Masukkan ID Teman disini...">
+        <button class="btn-connect" onclick="connectToPeer()">Sambungkan</button>
+    </div>
+
+    <div id="send-area" style="display: none;">
+        <p style="color: #69f0ae;">Terhubung dengan Teman!</p>
+        <input type="file" id="file-input">
+        <button class="btn-connect" onclick="sendFile()" style="margin-top:10px;">Kirim File</button>
+    </div>
+
+    <div class="log" id="log-area">
+        <div>Log aktivitas akan muncul di sini...</div>
+    </div>
+</div>
+
+<script>
+    const peer = new Peer(); // Biarkan PeerJS membuat ID random
+    let conn = null;
+
+    // 1. SAAT WEBSITE DIBUKA (Dapat ID)
+    peer.on('open', function(id) {
+        document.getElementById('my-id').innerText = id;
+        document.getElementById('status').innerText = "Siap menerima koneksi.";
+        log("ID Kamu siap: " + id);
+    });
+
+    // 2. SAAT ADA YANG KONEK KE KITA (Penerima)
+    peer.on('connection', function(c) {
+        conn = c;
+        setupConnection();
+        document.getElementById('status').innerText = "Terhubung dengan pengirim!";
+        document.getElementById('connect-area').style.display = 'none'; // Sembunyikan form konek
+        document.getElementById('send-area').style.display = 'block'; // Tampilkan tombol kirim
+        log("Ada teman yang terhubung!");
+    });
+
+    // 3. FUNGSI UNTUK KONEK KE TEMAN (Pengirim)
+    function connectToPeer() {
+        var friendId = document.getElementById('friend-id').value;
+        if(!friendId) return alert("Masukkan ID teman dulu!");
+        
+        document.getElementById('status').innerText = "Mencoba menghubungi...";
+        conn = peer.connect(friendId);
+        
+        conn.on('open', function() {
+            setupConnection();
+            document.getElementById('status').innerText = "Berhasil Terhubung!";
+            document.getElementById('connect-area').style.display = 'none';
+            document.getElementById('send-area').style.display = 'block';
+            log("Terhubung ke: " + friendId);
+        });
+    }
+
+    // 4. SETUP KONEKSI (Menangani Data Masuk)
+    function setupConnection() {
+        conn.on('data', function(data) {
+            // Cek apakah data ini File atau Pesan Teks
+            if (data.file) {
+                log("Menerima file: " + data.filename);
+                
+                // Membuat Link Download
+                const blob = new Blob([data.file], { type: data.filetype });
+                const url = URL.createObjectURL(blob);
+                
+                log(`<a href="${url}" download="${data.filename}" style="color:yellow; font-weight:bold;">[KLIK DISINI UNTUK DOWNLOAD ${data.filename}]</a>`, true);
+            } else {
+                log("Teman: " + data);
+            }
+        });
+    }
+
+    // 5. FUNGSI KIRIM FILE
+    function sendFile() {
+        const fileInput = document.getElementById('file-input');
+        const file = fileInput.files[0];
+
+        if (!file) return alert("Pilih file dulu!");
+        if (!conn) return alert("Belum ada koneksi!");
+
+        log("Mengirim file: " + file.name + "...");
+        
+        // Kirim object berisi file dan metadata
+        conn.send({
+            file: file,
+            filename: file.name,
+            filetype: file.type
+        });
+        
+        log("<span class='success'>File terkirim!</span>", true);
+    }
+
+    // Helper: Fungsi Log
+    function log(text, isHtml = false) {
+        const logArea = document.getElementById('log-area');
+        const div = document.createElement('div');
+        if(isHtml) div.innerHTML = text;
+        else div.innerText = "> " + text;
+        logArea.prepend(div);
+    }
+</script>
+
 </body>
 </html>
