@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Web LocalSend KW</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body style="background-color: #1e1e1e; color: white; font-family: sans-serif; text-align: center; padding: 50px;">
+
+    <h2>FH Local Share</h2>
+    <p>ID Kamu: <b id="my-id" style="color: cyan;">...loading...</b></p>
+    
+    <hr style="border-color: #333;">
+
+    <input type="text" id="friend-id" placeholder="Masukkan ID Teman" style="padding: 10px;">
+    <button onclick="connectToFriend()" style="padding: 10px;">Konek</button>
+
+    <div id="status" style="margin-top: 20px;">Menunggu koneksi...</div>
+
+    <script>
+        // 1. Minta ID ke Server PeerJS (Gratis & Public)
+        // Kita tidak perlu bikin server sendiri!
+        var peer = new Peer(); 
+
+        peer.on('open', function(id) {
+            document.getElementById('my-id').innerText = id;
+        });
+
+        // 2. Kalau ada yang mau konek ke kita
+        peer.on('connection', function(conn) {
+            conn.on('data', function(data) {
+                document.getElementById('status').innerText = "Teman bilang: " + data;
+                alert("Pesan masuk: " + data);
+            });
+        });
+
+        // 3. Fungsi konek ke teman
+        function connectToFriend() {
+            var friendId = document.getElementById('friend-id').value;
+            var conn = peer.connect(friendId);
+            
+            conn.on('open', function() {
+                // Kirim pesan test
+                conn.send('Halo! Kita sudah terhubung lewat fh.evan-cloud.my.id');
+                document.getElementById('status').innerText = "Terhubung! Pesan terkirim.";
+            });
+        }
+    </script>
+</body>
+</html>
