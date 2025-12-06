@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LocalSent Web - Evan</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    
     <style>
+        /* CSS: Tampilan Dark Mode */
         body {
             background-color: #121212;
             color: #e0e0e0;
@@ -20,150 +22,267 @@
         }
         .card {
             background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
             max-width: 400px;
             width: 100%;
             text-align: center;
+            border: 1px solid #333;
         }
-        h1 { margin-top: 0; color: #4db6ac; }
-        .box {
-            background: #2c2c2c;
+        h1 { margin-top: 0; color: #4db6ac; font-size: 24px; margin-bottom: 5px; }
+        p.subtitle { color: #888; font-size: 14px; margin-top: 0; }
+        
+        /* Area ID */
+        .id-box {
+            background: #252525;
             padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            word-break: break-all;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px dashed #444;
+            position: relative;
         }
+        .id-text {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #80cbc4;
+            display: block;
+            margin-top: 5px;
+            word-wrap: break-word;
+        }
+        
+        /* Input & Buttons */
         input, button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-top: 10px;
             border-radius: 8px;
             border: none;
             box-sizing: border-box;
+            font-size: 14px;
         }
-        input { background: #333; color: white; border: 1px solid #444; }
-        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-connect { background-color: #00897b; color: white; }
-        .btn-connect:hover { background-color: #00695c; }
-        .btn-file { background-color: #424242; color: white; display: none; }
+        input { 
+            background: #2c2c2c; 
+            color: white; 
+            border: 1px solid #444; 
+            text-align: center;
+        }
+        input:focus { outline: 2px solid #00897b; }
         
-        #status { font-size: 0.9em; color: #aaa; margin-bottom: 10px; }
-        .log { text-align: left; font-size: 0.85em; max-height: 150px; overflow-y: auto; background: #000; padding: 10px; margin-top: 15px; border-radius: 5px; }
+        button { cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-primary { background-color: #00897b; color: white; }
+        .btn-primary:hover { background-color: #00796b; transform: translateY(-1px); }
+        .btn-secondary { background-color: #424242; color: white; margin-top: 5px;}
+        .btn-copy { background: transparent; border: 1px solid #555; color: #aaa; padding: 5px; margin-top: 5px; width: auto; font-size: 12px;}
+        .btn-copy:hover { background: #333; color: white; }
+
+        /* Areas */
+        #connect-area, #send-area { margin-top: 20px; }
+        
+        /* Log */
+        .log-container {
+            text-align: left;
+            font-size: 12px;
+            height: 150px;
+            overflow-y: auto;
+            background: #000;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            font-family: monospace;
+        }
+        .log-item { margin-bottom: 4px; border-bottom: 1px solid #222; padding-bottom: 2px; }
         .success { color: #69f0ae; }
+        .error { color: #ff5252; }
+        .info { color: #64b5f6; }
+        
+        /* Loading Animation */
+        .spinner {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="card">
     <h1>LocalSent Web</h1>
-    <div id="status">Menghubungkan ke server...</div>
+    <p class="subtitle">Transfer file P2P tanpa server</p>
 
-    <div class="box">
-        <small>ID Kamu:</small><br>
-        <b id="my-id" style="font-size: 1.2em; color: #80cbc4;">...</b>
+    <div id="status" style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">
+        Menghubungkan ke jaringan... <div class="spinner"></div>
     </div>
 
+    <div class="id-box">
+        <small style="color:#aaa">ID Kamu:</small>
+        <span id="my-id" class="id-text">...</span>
+        <button class="btn-copy" onclick="copyId()">Salin ID</button>
+    </div>
+
+    <hr style="border-color: #333; opacity: 0.3;">
+
     <div id="connect-area">
-        <input type="text" id="friend-id" placeholder="Masukkan ID Teman disini...">
-        <button class="btn-connect" onclick="connectToPeer()">Sambungkan</button>
+        <input type="text" id="friend-id" placeholder="Paste ID Teman Disini">
+        <button class="btn-primary" onclick="connectToPeer()">SAMBUNGKAN</button>
     </div>
 
     <div id="send-area" style="display: none;">
-        <p style="color: #69f0ae;">Terhubung dengan Teman!</p>
+        <div style="background:#2e7d32; color:white; padding:10px; border-radius:8px; margin-bottom:15px;">
+            <b>✓ Terhubung!</b>
+        </div>
         <input type="file" id="file-input">
-        <button class="btn-connect" onclick="sendFile()" style="margin-top:10px;">Kirim File</button>
+        <button class="btn-primary" onclick="sendFile()">KIRIM FILE</button>
+        <button class="btn-secondary" onclick="location.reload()">Putuskan Koneksi</button>
     </div>
 
-    <div class="log" id="log-area">
-        <div>Log aktivitas akan muncul di sini...</div>
+    <div class="log-container" id="log-area">
+        <div class="log-item">System ready...</div>
     </div>
 </div>
 
 <script>
-    const peer = new Peer(); // Biarkan PeerJS membuat ID random
+    // --- KONFIGURASI PENTING ---
+    // Menggunakan Server STUN Google agar bisa tembus NAT/Firewall ringan
+    const peerConfig = {
+        debug: 2,
+        config: {
+            'iceServers': [
+                { url: 'stun:stun.l.google.com:19302' },
+                { url: 'stun:stun1.l.google.com:19302' },
+                { url: 'stun:stun2.l.google.com:19302' }
+            ]
+        }
+    };
+
+    const peer = new Peer(peerConfig);
     let conn = null;
 
-    // 1. SAAT WEBSITE DIBUKA (Dapat ID)
+    // 1. SAAT ID BERHASIL DIBUAT
     peer.on('open', function(id) {
         document.getElementById('my-id').innerText = id;
-        document.getElementById('status').innerText = "Siap menerima koneksi.";
-        log("ID Kamu siap: " + id);
+        document.getElementById('status').innerHTML = "<span class='success'>Online & Siap.</span>";
+        log("ID Anda berhasil dibuat: " + id, "info");
     });
 
-    // 2. SAAT ADA YANG KONEK KE KITA (Penerima)
+    // 2. DETEKSI ERROR (Penting!)
+    peer.on('error', function(err) {
+        console.error(err);
+        let msg = "Terjadi Kesalahan.";
+        if(err.type === 'peer-unavailable') msg = "ID Teman tidak ditemukan (Mungkin offline/salah ketik).";
+        if(err.type === 'network') msg = "Masalah Jaringan/Firewall.";
+        if(err.type === 'server-error') msg = "Server PeerJS sedang sibuk.";
+        
+        document.getElementById('status').innerHTML = "<span class='error'>Error!</span>";
+        log("ERROR: " + msg + " (" + err.type + ")", "error");
+        alert(msg);
+    });
+
+    // 3. SAAT ADA TEMAN YANG KONEK KE KITA (Mode Penerima)
     peer.on('connection', function(c) {
         conn = c;
         setupConnection();
-        document.getElementById('status').innerText = "Terhubung dengan pengirim!";
-        document.getElementById('connect-area').style.display = 'none'; // Sembunyikan form konek
-        document.getElementById('send-area').style.display = 'block'; // Tampilkan tombol kirim
-        log("Ada teman yang terhubung!");
+        document.getElementById('status').innerText = "Sedang menerima koneksi...";
+        log("Ada teman masuk...", "info");
     });
 
-    // 3. FUNGSI UNTUK KONEK KE TEMAN (Pengirim)
+    // 4. FUNGSI TOMBOL SAMBUNGKAN (Mode Pengirim)
     function connectToPeer() {
-        var friendId = document.getElementById('friend-id').value;
-        if(!friendId) return alert("Masukkan ID teman dulu!");
+        var friendId = document.getElementById('friend-id').value.trim();
+        if(!friendId) return alert("Isi ID teman dulu!");
         
-        document.getElementById('status').innerText = "Mencoba menghubungi...";
+        if(friendId === document.getElementById('my-id').innerText) return alert("Jangan masukkan ID sendiri!");
+
+        document.getElementById('status').innerText = "Menghubungi teman...";
+        log("Mencoba konek ke: " + friendId, "info");
+        
         conn = peer.connect(friendId);
         
         conn.on('open', function() {
             setupConnection();
-            document.getElementById('status').innerText = "Berhasil Terhubung!";
-            document.getElementById('connect-area').style.display = 'none';
-            document.getElementById('send-area').style.display = 'block';
-            log("Terhubung ke: " + friendId);
+        });
+        
+        conn.on('error', function(err) {
+            log("Gagal konek: " + err, "error");
         });
     }
 
-    // 4. SETUP KONEKSI (Menangani Data Masuk)
+    // 5. SETUP LOGIKA KONEKSI (Pengirim & Penerima sama logic-nya)
     function setupConnection() {
+        // Ubah Tampilan
+        document.getElementById('connect-area').style.display = 'none';
+        document.getElementById('send-area').style.display = 'block';
+        document.getElementById('status').innerText = "Terhubung P2P";
+        log(">>> KONEKSI BERHASIL TERBENTUK <<<", "success");
+
+        // Event saat data masuk
         conn.on('data', function(data) {
-            // Cek apakah data ini File atau Pesan Teks
             if (data.file) {
-                log("Menerima file: " + data.filename);
-                
-                // Membuat Link Download
+                // Ada File Masuk
+                log("Menerima file: " + data.filename, "info");
                 const blob = new Blob([data.file], { type: data.filetype });
                 const url = URL.createObjectURL(blob);
                 
-                log(`<a href="${url}" download="${data.filename}" style="color:yellow; font-weight:bold;">[KLIK DISINI UNTUK DOWNLOAD ${data.filename}]</a>`, true);
+                // Bikin link download otomatis di log
+                const link = `<a href="${url}" download="${data.filename}" style="color:yellow; font-weight:bold; background:#333; padding:2px 5px;">[DOWNLOAD: ${data.filename}]</a>`;
+                log(link, "success", true);
             } else {
-                log("Teman: " + data);
+                // Pesan Biasa
+                log("Teman: " + data, "info");
             }
+        });
+
+        conn.on('close', function() {
+            log("Koneksi terputus.", "error");
+            alert("Koneksi terputus!");
+            location.reload();
         });
     }
 
-    // 5. FUNGSI KIRIM FILE
+    // 6. FUNGSI KIRIM FILE
     function sendFile() {
         const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
 
         if (!file) return alert("Pilih file dulu!");
-        if (!conn) return alert("Belum ada koneksi!");
+        if (!conn) return alert("Koneksi belum siap!");
 
-        log("Mengirim file: " + file.name + "...");
-        
-        // Kirim object berisi file dan metadata
+        log("Mengirim file: " + file.name + " (Tunggu...)", "info");
+
+        // Kirim
         conn.send({
             file: file,
             filename: file.name,
             filetype: file.type
         });
-        
-        log("<span class='success'>File terkirim!</span>", true);
+
+        log("File berhasil dikirim!", "success");
     }
 
-    // Helper: Fungsi Log
-    function log(text, isHtml = false) {
+    // UTILITIES
+    function log(text, type = "info", isHtml = false) {
         const logArea = document.getElementById('log-area');
         const div = document.createElement('div');
-        if(isHtml) div.innerHTML = text;
-        else div.innerText = "> " + text;
+        div.className = "log-item " + type;
+        
+        const time = new Date().toLocaleTimeString();
+        if(isHtml) div.innerHTML = `[${time}] ${text}`;
+        else div.innerText = `[${time}] ${text}`;
+        
         logArea.prepend(div);
+    }
+
+    function copyId() {
+        const idText = document.getElementById('my-id').innerText;
+        navigator.clipboard.writeText(idText).then(() => {
+            alert("ID disalin!");
+        });
     }
 </script>
 
