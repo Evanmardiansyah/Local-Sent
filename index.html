@@ -3,337 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvanShare - P2P File Transfer</title>
+    <title>EvanShare Secure</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --primary: #00bfa5;
-            --primary-hover: #009688;
-            --text-main: #eeeeee;
-            --text-muted: #aaaaaa;
-            --border: #333333;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
+            margin: 0;
         }
 
         .container {
-            background-color: var(--card-bg);
+            background-color: var(--card);
             width: 90%;
-            max-width: 420px;
+            max-width: 450px;
             padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             text-align: center;
         }
 
-        h2 { margin-top: 0; color: var(--primary); letter-spacing: 1px; }
-        p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        h2 { margin: 0 0 5px 0; color: var(--primary); }
+        .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
 
-        /* ID Box */
-        .id-wrapper {
-            background: #252525;
-            border: 1px dashed #555;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            position: relative;
+        /* ID & PIN BOX */
+        .info-box {
+            background: #0f172a;
+            border: 1px border #334155;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: left;
         }
-        .my-id {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary);
-            letter-spacing: 1px;
-            display: block;
-            margin: 0.5rem 0;
-        }
-        .btn-copy {
-            background: transparent;
-            border: 1px solid #555;
-            color: #ccc;
-            padding: 4px 10px;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-copy:hover { background: #333; color: white; }
+        .info-label { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 5px;}
+        .info-value { font-size: 1.2rem; font-weight: bold; color: var(--success); letter-spacing: 1px; }
+        .pin-display { float: right; color: var(--primary); font-family: monospace; cursor: pointer;}
 
-        /* Input Area */
-        .input-group { margin-bottom: 1rem; text-align: left; }
-        label { font-size: 0.8rem; color: var(--text-muted); margin-left: 4px; }
-        
-        input[type="text"] {
+        /* Inputs */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        input {
             width: 100%;
             padding: 12px;
-            background: #2c2c2c;
-            border: 1px solid #444;
+            background: #334155;
+            border: 1px solid #475569;
             color: white;
             border-radius: 8px;
             box-sizing: border-box;
             font-size: 1rem;
             margin-top: 5px;
-            transition: 0.3s;
         }
-        input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        input:focus { outline: 2px solid var(--primary); }
 
         /* Buttons */
-        .btn-main {
+        .btn {
             width: 100%;
             padding: 14px;
-            background-color: var(--primary);
-            color: #000;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: bold;
-            font-size: 1rem;
             cursor: pointer;
+            font-size: 1rem;
             transition: 0.2s;
+            color: white;
         }
-        .btn-main:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-        .btn-danger { background-color: #cf6679; color: white; margin-top: 10px; }
+        .btn-primary { background: var(--primary); }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-danger { background: var(--danger); margin-top: 10px; }
 
-        /* Status & Logs */
-        #status { font-size: 0.85rem; margin: 1rem 0; font-weight: 500; }
-        .status-ok { color: #00e676; }
-        .status-err { color: #ff5252; }
-        .status-wait { color: #ffd740; }
-
-        .log-box {
+        /* Log & Status */
+        #status { font-weight: bold; margin: 15px 0; font-size: 0.9rem; }
+        .log-area {
             background: #000;
-            text-align: left;
-            padding: 10px;
-            border-radius: 6px;
             height: 120px;
             overflow-y: auto;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
             font-family: monospace;
-            font-size: 0.75rem;
-            border: 1px solid #333;
-            margin-top: 1rem;
+            font-size: 0.8rem;
+            margin-top: 15px;
+            border: 1px solid #334155;
         }
-        .log-item { margin-bottom: 3px; border-bottom: 1px solid #1a1a1a; padding-bottom: 2px; }
-        
-        /* Hidden Elements */
         .hidden { display: none; }
-        
-        /* Download Link Style */
-        .dl-link {
-            display: block;
-            background: #2e7d32;
-            color: white;
-            padding: 8px;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 5px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><i class="fas fa-share-alt"></i> EvanShare</h2>
-    <div id="status" class="status-wait">Menginisialisasi...</div>
+    <h2><i class="fas fa-network-wired"></i> EvanShare Secure</h2>
+    <p class="subtitle">Transfer P2P dengan PIN Keamanan</p>
 
-    <div id="page-connect">
-        <div class="id-wrapper">
-            <small>ID Kamu</small>
-            <span id="my-id" class="my-id">...</span>
-            <button class="btn-copy" onclick="copyId()"><i class="far fa-copy"></i> Salin</button>
+    <div id="status" style="color: var(--muted);">Menyiapkan ID...</div>
+
+    <div id="page-home">
+        <div class="info-box">
+            <span class="info-label">ID Perangkat Ini:</span>
+            <div class="info-value" id="my-id">...</div>
+            <hr style="border-color: #334155; opacity: 0.3; margin: 10px 0;">
+            <span class="info-label">PIN Keamanan Saya:</span>
+            <input type="number" id="my-pin" value="1234" style="width: 80px; padding: 5px; text-align: center;">
+            <small style="color: var(--muted); font-size: 0.7rem;">(Teman harus isi PIN ini untuk konek)</small>
         </div>
 
         <div class="input-group">
-            <label>Kirim ke ID Teman:</label>
-            <input type="text" id="friend-id" placeholder="Contoh: evan-xxxx">
+            <label class="info-label">ID Teman (Tujuan)</label>
+            <input type="text" id="target-id" placeholder="Contoh: PC-Tiger-88">
         </div>
-        <button class="btn-main" onclick="connectToPeer()">Sambungkan <i class="fas fa-plug"></i></button>
-    </div>
-
-    <div id="page-send" class="hidden">
-        <div style="background: rgba(0, 191, 165, 0.1); padding: 10px; border-radius: 8px; border: 1px solid var(--primary); margin-bottom: 15px;">
-            <i class="fas fa-check-circle" style="color: var(--primary);"></i> Terhubung P2P
+        <div class="input-group">
+            <label class="info-label">PIN Teman</label>
+            <input type="number" id="target-pin" placeholder="Masukkan PIN teman (Default: 1234)">
         </div>
         
-        <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect()">
-        <button class="btn-main" onclick="document.getElementById('file-input').click()">
-            <i class="fas fa-file-upload"></i> Pilih & Kirim File
+        <button class="btn btn-primary" onclick="initiateConnection()">
+            <i class="fas fa-lock"></i> Sambungkan Aman
         </button>
-        <div id="selected-file" style="margin-top: 10px; font-size: 0.8rem; color: #888;"></div>
-        
-        <button class="btn-main btn-danger" onclick="location.reload()">Putuskan</button>
     </div>
 
-    <div class="log-box" id="log-area">
-        <div class="log-item">System ready...</div>
+    <div id="page-transfer" class="hidden">
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; border: 1px solid var(--success);">
+            <i class="fas fa-shield-alt" style="color: var(--success);"></i> Koneksi Terverifikasi!
+        </div>
+        
+        <br>
+        <input type="file" id="file-input" class="hidden" onchange="handleFileSelect()">
+        <button class="btn btn-primary" onclick="document.getElementById('file-input').click()">
+            <i class="fas fa-file-export"></i> Pilih File
+        </button>
+        <div id="file-name-display" style="margin-top:10px; color:#ccc; font-size:0.9rem;"></div>
+
+        <button class="btn btn-danger" onclick="location.reload()">Putuskan</button>
+    </div>
+
+    <div class="log-area" id="log-box">
+        <div>> System Ready.</div>
     </div>
 </div>
 
 <script>
-    // --- 1. CONFIG & ID GENERATOR ---
-    // Gunakan server Google STUN supaya lebih tembus firewall
+    // --- 1. CONFIG & RANDOM NAME GENERATOR ---
+    // Nama random biar keren: PC-Lion-99
+    const devices = ["PC", "Laptop", "HP", "Tab"];
+    const animals = ["Tiger", "Lion", "Eagle", "Shark", "Wolf", "Bear"];
+    
+    function generateId() {
+        const dev = devices[Math.floor(Math.random() * devices.length)];
+        const ani = animals[Math.floor(Math.random() * animals.length)];
+        const num = Math.floor(10 + Math.random() * 90); // 10-99
+        return `${dev}-${ani}-${num}`;
+    }
+
+    const myId = generateId();
     const peerConfig = {
         debug: 1,
-        config: {
-            'iceServers': [
-                { url: 'stun:stun.l.google.com:19302' },
-                { url: 'stun:stun1.l.google.com:19302' }
-            ]
-        }
+        config: { 'iceServers': [{ url: 'stun:stun.l.google.com:19302' }] }
     };
 
-    // Fungsi bikin ID "evan-xxxx"
-    function generateId() {
-        const random = Math.floor(1000 + Math.random() * 9000); // Angka 1000-9999
-        return "evan-" + random;
-    }
-
-    let myId = generateId();
     let peer = new Peer(myId, peerConfig);
     let conn = null;
+    let isAuthenticated = false;
 
-    // --- 2. EVENT HANDLERS ---
-
-    // Saat berhasil dapat ID
-    peer.on('open', function(id) {
+    // --- 2. PEER EVENTS ---
+    
+    peer.on('open', (id) => {
         document.getElementById('my-id').innerText = id;
-        setStatus("Siap. Bagikan ID ini ke teman.", "ok");
-        log("ID Anda aktif: " + id);
+        setStatus("Online. Menunggu koneksi...", "#10b981");
     });
 
-    // Saat ID sudah dipakai (Retry otomatis)
-    peer.on('error', function(err) {
-        console.error(err);
-        if (err.type === 'unavailable-id') {
-            log("ID " + myId + " sudah dipakai, mencari ID baru...", "err");
-            myId = generateId();
-            peer.destroy();
-            setTimeout(() => {
-                peer = new Peer(myId, peerConfig);
-            }, 500);
-            return;
-        }
-        
-        // Handle Error Network (Kantor Block)
-        let msg = "Error sistem.";
-        if(err.type === 'network' || err.type === 'peer-unavailable') {
-            msg = "Gagal koneksi. Cek internet/Firewall.";
-        }
-        setStatus(msg, "err");
-        log("ERROR: " + err.type, "err");
+    peer.on('error', (err) => {
+        log("Error: " + err.type);
+        if(err.type === 'unavailable-id') alert("ID tabrakan, refresh halaman!");
+        else setStatus("Koneksi Error. Cek Jaringan.", "#ef4444");
     });
 
-    // Saat ada teman yang konek ke kita
-    peer.on('connection', function(c) {
+    // --- 3. LOGIKA PENERIMA (SERVER SIDE LOGIC) ---
+    // Saat ada orang asing mau masuk
+    peer.on('connection', (c) => {
         conn = c;
-        setupConnection();
-        setStatus("Teman terhubung!", "ok");
-        log("Menerima koneksi masuk...");
-    });
+        
+        // Jangan langsung terima! Tunggu dia kirim PIN dulu.
+        log(`Ada permintaan koneksi dari ${conn.peer}...`);
+        setStatus("Memverifikasi PIN pengirim...", "#facc15");
 
-    // --- 3. FUNGSI UTAMA ---
-
-    function connectToPeer() {
-        const friendId = document.getElementById('friend-id').value.trim();
-        if(!friendId) return alert("Masukkan ID teman dulu!");
-        if(friendId === myId) return alert("Itu ID sendiri, gan!");
-
-        setStatus("Menghubungi " + friendId + "...", "wait");
-        conn = peer.connect(friendId);
-
-        conn.on('open', function() {
-            setupConnection();
-            setStatus("Berhasil Konek!", "ok");
-        });
-
-        conn.on('error', function(err) {
-            setStatus("Gagal konek.", "err");
-            alert("Gagal konek: " + err);
-        });
-    }
-
-    function setupConnection() {
-        // Ganti tampilan ke mode kirim
-        document.getElementById('page-connect').classList.add('hidden');
-        document.getElementById('page-send').classList.remove('hidden');
-
-        // Handle data masuk
-        conn.on('data', function(data) {
-            if (data.file) {
-                log("File diterima: " + data.filename);
+        conn.on('data', (data) => {
+            // A. Fase Handshake (Cek PIN)
+            if (data.type === 'auth-request') {
+                const myPin = document.getElementById('my-pin').value;
+                if (data.pin === myPin) {
+                    log("PIN Benar! Koneksi diterima.");
+                    conn.send({ type: 'auth-response', status: 'success' });
+                    isAuthenticated = true;
+                    showTransferPage();
+                } else {
+                    log("PIN SALAH! Menolak koneksi.");
+                    conn.send({ type: 'auth-response', status: 'fail' });
+                    setTimeout(() => conn.close(), 500); // Tendang user
+                }
+            }
+            
+            // B. Fase Terima File (Hanya jika sudah Authenticated)
+            else if (data.type === 'file' && isAuthenticated) {
+                log(`Menerima file: ${data.filename}`);
                 const blob = new Blob([data.file], { type: data.filetype });
                 const url = URL.createObjectURL(blob);
-                
-                // Tampilkan link download
-                const link = `<a href="${url}" download="${data.filename}" class="dl-link"><i class="fas fa-download"></i> TERIMA: ${data.filename}</a>`;
-                log(link, true);
+                logHTML(`<a href="${url}" download="${data.filename}" style="color:yellow; text-decoration:none;">[DOWNLOAD ${data.filename}]</a>`);
             }
         });
 
-        conn.on('close', function() {
-            alert("Koneksi terputus!");
+        conn.on('close', () => {
+            alert("Koneksi terputus.");
             location.reload();
         });
+    });
+
+    // --- 4. LOGIKA PENGIRIM (CLIENT SIDE LOGIC) ---
+    function initiateConnection() {
+        const targetId = document.getElementById('target-id').value.trim();
+        const targetPin = document.getElementById('target-pin').value.trim();
+
+        if(!targetId || !targetPin) return alert("ID dan PIN tidak boleh kosong!");
+
+        setStatus(`Menghubungi ${targetId}...`, "#facc15");
+        conn = peer.connect(targetId);
+
+        conn.on('open', () => {
+            log("Terhubung ke server peer. Mengirim PIN...");
+            // Kirim PIN untuk diverifikasi
+            conn.send({ type: 'auth-request', pin: targetPin });
+        });
+
+        conn.on('data', (data) => {
+            if (data.type === 'auth-response') {
+                if (data.status === 'success') {
+                    log("PIN Diterima! Koneksi Aman.");
+                    isAuthenticated = true;
+                    showTransferPage();
+                } else {
+                    alert("PIN SALAH! Koneksi ditolak oleh penerima.");
+                    conn.close();
+                }
+            }
+        });
+
+        conn.on('error', (err) => log("Koneksi error: " + err));
     }
 
+    // --- 5. TRANSFER FILE ---
     function handleFileSelect() {
         const file = document.getElementById('file-input').files[0];
-        if(file) {
-            document.getElementById('selected-file').innerText = "Siap kirim: " + file.name;
-            // Langsung kirim saat dipilih (atau bisa pakai tombol terpisah)
+        if (file) {
+            document.getElementById('file-name-display').innerText = "Siap kirim: " + file.name;
             sendFile(file);
         }
     }
 
     function sendFile(file) {
-        if(!conn) return alert("Koneksi putus!");
+        if(!conn || !isAuthenticated) return alert("Belum konek aman!");
         
-        log("Mengirim " + file.name + "...", "wait");
-        
+        log(`Mengirim ${file.name}...`);
         conn.send({
+            type: 'file',
             file: file,
             filename: file.name,
             filetype: file.type
         });
-
-        log("Berhasil terkirim!", "ok");
-        document.getElementById('selected-file').innerText = "✅ Terkirim: " + file.name;
+        log("File terkirim!");
     }
 
-    // --- 4. UTILITIES ---
-    function setStatus(msg, type) {
+    // --- UTILS ---
+    function showTransferPage() {
+        document.getElementById('page-home').classList.add('hidden');
+        document.getElementById('page-transfer').classList.remove('hidden');
+        setStatus("Terhubung Aman (Encrypted)", "#10b981");
+    }
+
+    function setStatus(msg, color) {
         const el = document.getElementById('status');
         el.innerText = msg;
-        el.className = ""; // reset
-        if(type === 'ok') el.classList.add('status-ok');
-        if(type === 'err') el.classList.add('status-err');
-        if(type === 'wait') el.classList.add('status-wait');
+        el.style.color = color;
     }
 
-    function log(msg, isHtml = false) {
-        const area = document.getElementById('log-area');
+    function log(msg) {
+        const box = document.getElementById('log-box');
         const d = document.createElement('div');
-        d.className = 'log-item';
-        if(isHtml) d.innerHTML = msg;
-        else d.innerText = "> " + msg;
-        area.prepend(d);
+        d.innerText = "> " + msg;
+        box.prepend(d);
     }
-
-    function copyId() {
-        navigator.clipboard.writeText(document.getElementById('my-id').innerText);
-        alert("ID Disalin!");
+    
+    function logHTML(html) {
+        const box = document.getElementById('log-box');
+        const d = document.createElement('div');
+        d.innerHTML = "> " + html;
+        box.prepend(d);
     }
 </script>
 
