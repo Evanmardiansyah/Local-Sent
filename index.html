@@ -3,25 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvanShare Ultimate</title>
+    <title>EvanShare Stable</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
         :root {
-            --bg: #0f172a; /* Lebih gelap & modern */
+            --bg: #0f172a;
             --card: #1e293b;
-            --primary: #10b981; /* Emerald Green */
-            --primary-hover: #059669;
+            --primary: #10b981;
             --danger: #ef4444;
-            --text: #f1f5f9;
+            --text: #f8fafc;
             --border: #334155;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             display: flex;
             align-items: center;
@@ -32,139 +31,101 @@
         .container {
             background-color: var(--card);
             width: 90%;
-            max-width: 460px;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            padding: 25px;
+            border-radius: 16px;
             border: 1px solid var(--border);
             text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
-        h2 { margin: 0 0 5px 0; color: var(--primary); letter-spacing: 0.5px; }
-        .subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 25px; }
+        /* HEADER */
+        h2 { margin: 0; color: var(--primary); letter-spacing: 0.5px; }
+        .server-status { font-size: 0.75rem; color: #64748b; margin-bottom: 20px; margin-top: 5px; }
+        .status-dot { height: 8px; width: 8px; background-color: #64748b; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .online { background-color: #10b981; box-shadow: 0 0 8px #10b981; }
+        .offline { background-color: #ef4444; }
 
-        /* --- INFO BOX --- */
-        .info-panel {
+        /* ID BOX */
+        .id-panel {
             background: #0f172a;
-            border: 1px solid var(--border);
+            border: 1px dashed var(--border);
             padding: 15px;
             border-radius: 12px;
             margin-bottom: 20px;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 10px;
-            text-align: left;
         }
-        
-        .info-label { font-size: 0.7rem; color: #64748b; display: block; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .info-val-lg { font-size: 1.25rem; font-weight: 800; color: var(--text); display: block; }
-        .info-val-md { font-size: 1.25rem; font-weight: 800; color: var(--primary); display: block; }
+        .my-id-display { font-size: 1.5rem; font-weight: 800; color: white; display: block; margin: 5px 0; }
+        .pin-display { font-size: 0.9rem; color: var(--primary); font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 4px; }
 
-        /* --- ACTIONS --- */
-        .action-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 25px;
-        }
-        .input-rename {
-            flex: 1;
-            background: #334155;
-            border: 1px solid #475569;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 0.9rem;
+        /* CONTROLS */
+        .control-group { display: flex; gap: 8px; margin-top: 10px; }
+        .input-dark {
+            flex: 1; background: #1e293b; border: 1px solid var(--border);
+            color: white; padding: 10px; border-radius: 8px; text-align: center;
         }
         .btn-icon {
-            background: #334155; color: white; border: 1px solid #475569;
-            padding: 0 14px; border-radius: 8px; cursor: pointer; transition: 0.2s;
+            background: #334155; color: white; border: none; padding: 0 15px;
+            border-radius: 8px; cursor: pointer;
         }
         .btn-icon:hover { background: #475569; }
 
-        /* --- FORM KONEKSI --- */
+        /* CONNECT FORM */
         .connect-box {
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px dashed var(--border);
-            text-align: left;
+            background: rgba(255,255,255,0.03);
+            padding: 20px; border-radius: 12px;
+            text-align: left; margin-top: 20px;
         }
-        .input-group { margin-bottom: 12px; }
         .input-full {
-            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
-            color: white; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
-            transition: 0.2s;
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border);
+            color: white; border-radius: 8px; box-sizing: border-box; font-size: 1rem; margin-bottom: 10px;
         }
-        .input-full:focus { outline: none; border-color: var(--primary); }
-
         .btn-main {
-            width: 100%; padding: 14px; background-color: var(--primary);
-            color: #000; border: none; border-radius: 10px; font-weight: 700;
-            font-size: 1rem; cursor: pointer; margin-top: 10px; transition: 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            width: 100%; padding: 14px; background: var(--primary); color: #000;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1rem;
+            cursor: pointer; transition: 0.2s;
         }
-        .btn-main:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
-        .btn-danger { background-color: var(--danger); color: white; box-shadow: none; }
-        .btn-danger:hover { background-color: #dc2626; }
+        .btn-main:hover { filter: brightness(1.1); }
+        .btn-danger { background: var(--danger); color: white; }
 
-        /* --- PAGE SEND --- */
+        /* SEND AREA */
         .send-area { display: none; }
-        .success-badge {
-            background: rgba(16, 185, 129, 0.1); color: var(--primary);
-            padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.9rem;
-            margin-bottom: 20px; border: 1px solid rgba(16, 185, 129, 0.2);
-        }
+        .file-status { margin-top: 10px; font-size: 0.85rem; color: var(--primary); }
 
-        /* --- LOGS --- */
+        /* LOGS */
         #log-area {
-            background: #000; text-align: left; padding: 12px;
+            background: black; text-align: left; padding: 10px;
             border-radius: 8px; height: 100px; overflow-y: auto;
-            font-family: 'Courier New', monospace; font-size: 0.75rem;
-            border: 1px solid #333; margin-top: 25px; color: #cbd5e1;
+            font-family: monospace; font-size: 0.7rem; color: #cbd5e1;
+            margin-top: 20px; border: 1px solid var(--border);
         }
-        .log-item { margin-bottom: 4px; border-bottom: 1px solid #1e293b; padding-bottom: 2px; }
-        
-        .dl-btn {
-            display: block; background: #064e3b; color: #34d399;
-            padding: 10px; text-decoration: none; border-radius: 6px;
-            margin-top: 6px; font-weight: bold; border: 1px solid #059669;
-        }
+        .dl-link { display: block; background: #064e3b; color: #34d399; padding: 8px; text-decoration: none; border-radius: 4px; margin-top: 5px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><i class="fas fa-satellite-dish"></i> EvanShare <small style="font-size:0.5em; opacity:0.6;">Pro</small></h2>
-    <div class="subtitle" id="status-text">Memuat sistem...</div>
+    <h2>EvanShare <small style="font-size:0.5em; opacity:0.7;">v3.1 Stable</small></h2>
+    
+    <div class="server-status">
+        <span id="server-dot" class="status-dot"></span>
+        <span id="status-text">Menghubungkan Server...</span>
+    </div>
 
     <div id="page-setup">
-        <div class="info-panel">
-            <div>
-                <span class="info-label">ID SAYA</span>
-                <span id="my-id" class="info-val-lg">...</span>
-            </div>
-            <div style="border-left: 1px solid var(--border); padding-left: 10px;">
-                <span class="info-label">PIN</span>
-                <span id="my-pin" class="info-val-md">1234</span>
-            </div>
-        </div>
+        <div class="id-panel">
+            <small style="color:#64748b;">ID PERANGKAT INI</small>
+            <span id="my-id" class="my-id-display">...</span>
+            <span class="pin-display"><i class="fas fa-key"></i> PIN: 1234</span>
 
-        <div class="action-bar">
-            <input type="text" id="rename-input" class="input-rename" placeholder="Ganti Nama (Opsional)">
-            <button class="btn-icon" onclick="changeId()" title="Ganti Nama"><i class="fas fa-check"></i></button>
-            <button class="btn-icon" onclick="copyId()" title="Salin ID"><i class="far fa-copy"></i></button>
+            <div class="control-group">
+                <input type="text" id="rename-input" class="input-dark" placeholder="Ganti Nama ID">
+                <button class="btn-icon" onclick="changeId()" title="Simpan Nama"><i class="fas fa-check"></i></button>
+            </div>
         </div>
 
         <div class="connect-box">
-            <div class="input-group">
-                <label class="info-label">ID TEMAN</label>
-                <input type="text" id="friend-id" class="input-full" placeholder="Contoh: Tiger-88">
-            </div>
-            <div class="input-group">
-                <label class="info-label">PIN TEMAN</label>
-                <input type="number" id="friend-pin" class="input-full" value="1234" placeholder="Wajib Diisi">
-            </div>
+            <input type="text" id="friend-id" class="input-full" placeholder="ID Teman (Contoh: Tiger-88)">
+            <input type="number" id="friend-pin" class="input-full" value="1234" placeholder="PIN Teman">
             <button class="btn-main" onclick="connectToPeer()">
                 SAMBUNGKAN <i class="fas fa-bolt"></i>
             </button>
@@ -172,42 +133,38 @@
     </div>
 
     <div id="page-send" class="send-area">
-        <div class="success-badge">
-            <i class="fas fa-lock"></i> KONEKSI AMAN & TERENKRIPSI
+        <div style="background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--primary);">
+            <i class="fas fa-shield-alt"></i> TERHUBUNG AMAN
         </div>
-        
-        <p style="color:#94a3b8; font-size:0.9rem;">Siap mengirim file tanpa batas.</p>
 
         <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect()">
         <button class="btn-main" onclick="document.getElementById('file-input').click()">
             <i class="fas fa-file-upload"></i> PILIH FILE
         </button>
-        <div id="file-status" style="margin-top:10px; color: var(--primary); font-size:0.9rem;"></div>
+        <div id="file-status" class="file-status"></div>
 
-        <button class="btn-main btn-danger" onclick="location.reload()">
-            <i class="fas fa-power-off"></i> Putus Koneksi
+        <button class="btn-main btn-danger" onclick="location.reload()" style="margin-top:10px;">
+            Putus Koneksi
         </button>
     </div>
 
     <div id="log-area">
-        <div class="log-item">System ready.</div>
+        <div>System initialized...</div>
     </div>
 </div>
 
 <script>
     // --- DATABASE KATA ---
-    const words = ["Tiger", "Eagle", "Panda", "Shark", "Lion", "Mars", "Pluto", "Raptor", "Sonic", "Flash", "Neon", "Cyber", "Alpha", "Omega", "Titan", "Orbit"];
+    const words = ["Tiger", "Eagle", "Panda", "Shark", "Lion", "Mars", "Pluto", "Raptor", "Sonic", "Flash"];
 
-    // --- CONFIG STABIL (Updated) ---
-    // Menambahkan server STUN cadangan supaya lebih tembus jaringan WiFi
+    // --- CONFIG STABIL (BACK TO BASICS) ---
+    // Kita pakai Google STUN saja yang paling nurut
     const peerConfig = {
         debug: 1,
         config: {
             'iceServers': [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:global.stun.twilio.com:3478' }
+                { urls: 'stun:stun1.l.google.com:19302' }
             ]
         }
     };
@@ -215,15 +172,19 @@
     let peer = null;
     let conn = null;
     let myCurrentId = "";
-    let myPin = "1234"; 
+    const myPin = "1234";
 
-    // Start System
+    // Start
     initPeer();
 
     function initPeer(customId = null) {
-        if (peer) peer.destroy(); 
+        // Safe Destroy: Pastikan koneksi lama mati dulu
+        if (peer) {
+            peer.destroy();
+            peer = null;
+        }
 
-        // Generator ID Random
+        // Generator ID
         if (!customId) {
             const w = words[Math.floor(Math.random() * words.length)];
             const n = Math.floor(Math.random() * 90) + 10;
@@ -231,101 +192,120 @@
         }
 
         myCurrentId = customId;
-        peer = new Peer(myCurrentId, peerConfig);
+        
+        try {
+            peer = new Peer(myCurrentId, peerConfig);
+        } catch (e) {
+            console.error("PeerJS Error:", e);
+            alert("Browser memblokir akses. Coba matikan Incognito Mode.");
+            return;
+        }
 
-        // --- HANDLERS PEER ---
+        // --- EVENT HANDLERS ---
+        
         peer.on('open', function(id) {
             document.getElementById('my-id').innerText = id;
-            document.getElementById('my-pin').innerText = myPin;
             document.getElementById('rename-input').value = "";
-            setStatus("Online. Siap.", "#10b981");
+            setServerStatus(true, "Online (Siap)");
             log("ID Aktif: " + id);
         });
 
         peer.on('error', function(err) {
             console.error(err);
+            setServerStatus(false, "Error: " + err.type);
+            
             if(err.type === 'unavailable-id') {
-                alert("Nama ID sudah dipakai! Ganti nama lain.");
-                // Jangan reset, biarkan user ganti sendiri
+                alert("Nama ID sudah dipakai orang lain.");
             } else if (err.type === 'network' || err.type === 'peer-unavailable') {
-                setStatus("Gangguan Jaringan.", "#ef4444");
-                log("Error: Cek koneksi internet/Firewall.");
-            } else {
-                setStatus("Error: " + err.type, "#ef4444");
+                // Jangan panik, kadang cuma timeout sebentar
+                log("Masalah jaringan...");
+            } else if (err.type === 'server-error') {
+                 log("Server PeerJS sibuk. Mencoba reconnect...");
             }
         });
 
-        // SAAT ADA YANG MASUK (RECEIVER)
+        // Handler jika koneksi ke server putus (PENTING!)
+        peer.on('disconnected', function() {
+            setServerStatus(false, "Terputus dari Server.");
+            log("Koneksi server putus. Mencoba nyambung lagi...");
+            // Auto Reconnect
+            setTimeout(() => {
+                if(peer && !peer.destroyed) peer.reconnect();
+            }, 3000);
+        });
+
+        // Saat ada teman masuk
         peer.on('connection', function(c) {
+            // Validasi PIN
             const senderPin = c.metadata ? c.metadata.pin : null;
-            
             if (senderPin != myPin) {
                 c.close();
-                log("Seseorang mencoba masuk dengan PIN SALAH!", "#ef4444");
-                // Tidak perlu alert biar tidak mengganggu
+                log("Ada yang masuk tapi PIN SALAH.");
             } else {
                 conn = c;
                 setupConnection();
-                setStatus("Terhubung!", "#10b981");
                 log("Teman masuk: " + c.peer);
             }
         });
     }
 
-    // --- FUNGSI GANTI NAMA ---
+    // --- FUNGSI GANTI NAMA (SAFE MODE) ---
     function changeId() {
         let val = document.getElementById('rename-input').value.trim();
-        val = val.replace(/\s+/g, '-'); // Spasi jadi strip
-        if(val.length < 3) return alert("Nama terlalu pendek!");
-        initPeer(val);
+        val = val.replace(/\s+/g, '-');
+        if(val.length < 3) return alert("Kependekan bro!");
+
+        // Update UI dulu biar user tau lagi loading
+        setServerStatus(false, "Mengganti Nama...");
+        log("Merestart koneksi...");
+
+        // JEDA 1 DETIK supaya server tidak crash
+        setTimeout(() => {
+            initPeer(val);
+        }, 1000);
     }
 
-    // --- FUNGSI MENGHUBUNGI (SENDER) ---
+    // --- KONEKSI KE TEMAN ---
     function connectToPeer() {
         let friendId = document.getElementById('friend-id').value.trim();
         let friendPin = document.getElementById('friend-pin').value.trim();
-        
         friendId = friendId.replace(/\s+/g, '-');
 
-        if(!friendId) return alert("Isi ID Teman!");
-        if(!friendPin) return alert("Isi PIN Teman!");
+        if(!friendId || !friendPin) return alert("Isi ID dan PIN Teman!");
         if(friendId === myCurrentId) return alert("Itu ID sendiri!");
 
-        setStatus("Menghubungi " + friendId + "...", "#f59e0b"); // Orange
+        log("Menghubungi " + friendId + "...");
         
-        // Konek dengan Opsi Stabil (Reliable)
         conn = peer.connect(friendId, {
             metadata: { pin: friendPin },
-            reliable: true // Paksa mode stabil
+            reliable: true 
         });
 
-        conn.on('open', function() {
-            setupConnection();
-        });
-
-        // Error Handling Koneksi
+        conn.on('open', function() { setupConnection(); });
+        
         conn.on('close', function() {
-            setStatus("Koneksi Putus/Ditolak.", "#ef4444");
-            alert("Koneksi gagal/putus. Cek PIN atau refresh halaman.");
+            alert("Koneksi ditolak/putus!");
             location.reload();
         });
-
-        conn.on('error', function(err) {
-            log("Koneksi error: " + err);
-        });
+        
+        conn.on('error', function(err) { log("Error koneksi: " + err); });
+        
+        // Timeout manual jika 5 detik gak nyambung
+        setTimeout(() => {
+            if(!conn.open) log("Lama banget... Cek ID teman lagi.");
+        }, 5000);
     }
 
     function setupConnection() {
         document.getElementById('page-setup').style.display = 'none';
         document.getElementById('page-send').style.display = 'block';
-        setStatus("Terhubung Aman", "#10b981");
-
+        
         conn.on('data', function(data) {
             if (data.file) {
                 log("Menerima: " + data.filename);
                 const blob = new Blob([data.file], { type: data.filetype });
                 const url = URL.createObjectURL(blob);
-                const link = `<a href="${url}" download="${data.filename}" class="dl-btn"><i class="fas fa-download"></i> DOWNLOAD: ${data.filename}</a>`;
+                const link = `<a href="${url}" download="${data.filename}" class="dl-link">DOWNLOAD: ${data.filename}</a>`;
                 log(link, true);
             }
         });
@@ -335,46 +315,38 @@
         const file = document.getElementById('file-input').files[0];
         if(file) {
             document.getElementById('file-status').innerText = "File: " + file.name;
-            if(confirm("Kirim " + file.name + "?")) {
-                sendFile(file);
-            }
+            if(confirm("Kirim " + file.name + "?")) sendFile(file);
         }
     }
 
     function sendFile(file) {
         if(!conn) return alert("Koneksi putus!");
-        log("Mengirim file...", "#f59e0b");
-        
-        conn.send({
-            file: file,
-            filename: file.name,
-            filetype: file.type
-        });
-        
-        log("File Terkirim!", "#10b981");
+        log("Mengirim file...");
+        conn.send({ file: file, filename: file.name, filetype: file.type });
+        log("Terkirim!");
         document.getElementById('file-status').innerText = "✅ Terkirim: " + file.name;
     }
 
     // UTILS
-    function setStatus(msg, color) {
-        const el = document.getElementById('status-text');
-        el.innerText = msg;
-        el.style.color = color;
+    function setServerStatus(isOnline, text) {
+        const dot = document.getElementById('server-dot');
+        const txt = document.getElementById('status-text');
+        txt.innerText = text;
+        if(isOnline) {
+            dot.className = "status-dot online";
+            txt.style.color = "#10b981";
+        } else {
+            dot.className = "status-dot offline";
+            txt.style.color = "#ef4444";
+        }
     }
+
     function log(msg, isHtml = false) {
         const area = document.getElementById('log-area');
         const d = document.createElement('div');
-        d.className = 'log-item';
-        if(typeof isHtml === 'boolean' && isHtml) d.innerHTML = msg;
-        else {
-            d.innerText = "> " + msg;
-            if(typeof isHtml === 'string') d.style.color = isHtml;
-        }
+        if(isHtml) d.innerHTML = msg;
+        else d.innerText = "> " + msg;
         area.prepend(d);
-    }
-    function copyId() {
-        navigator.clipboard.writeText(document.getElementById('my-id').innerText);
-        alert("ID Disalin!");
     }
 </script>
 
