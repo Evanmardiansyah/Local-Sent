@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvanShare Final</title>
+    <title>EvanShare Stable (Dec 6)</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* CSS Clean Dark Mode (Versi Stabil) */
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --primary: #10b981;
-            --danger: #ef4444;
-            --text: #f8fafc;
-            --border: #334155;
-            --input-bg: #0f172a;
+            --bg: #121212;
+            --card: #1e1e1e;
+            --primary: #00e676; 
+            --danger: #ff5252;
+            --text: #ffffff;
+            --border: #333;
         }
 
         body {
@@ -32,156 +32,140 @@
         .container {
             background-color: var(--card);
             width: 90%;
-            max-width: 450px;
+            max-width: 420px;
             padding: 25px;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid var(--border);
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        h2 { margin: 0 0 5px 0; color: var(--primary); letter-spacing: 0.5px; }
-        .subtitle { color: #64748b; font-size: 0.8rem; margin-bottom: 20px; }
+        h2 { margin: 0 0 15px 0; color: var(--primary); }
 
-        /* --- BOX ID SAYA --- */
-        .id-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px dashed var(--border);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            position: relative;
+        /* AREA ID SAYA */
+        .id-box {
+            background: #252525;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px dashed #555;
+            margin-bottom: 20px;
         }
 
-        .label-small { font-size: 0.7rem; color: #94a3b8; letter-spacing: 1px; display: block; margin-bottom: 5px; }
-        
-        .my-id-display { 
-            font-size: 1.8rem; 
-            font-weight: 800; 
-            color: white; 
-            display: block; 
+        .my-id-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: block;
             margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.2);
         }
 
-        .action-row {
+        .tools-row {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 15px;
-            align-items: center;
         }
 
-        .btn-copy {
-            background: #334155; color: white; border: 1px solid var(--border);
-            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.9rem;
-            transition: 0.2s;
+        /* Tombol & Input Kecil */
+        .btn-small {
+            background: #333; color: #ccc; border: 1px solid #444;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer;
         }
-        .btn-copy:hover { background: #475569; }
+        .btn-small:hover { background: #444; color: white; }
 
-        .pin-input {
-            width: 80px;
-            background: var(--input-bg);
-            border: 1px solid var(--border);
-            color: var(--primary);
-            font-weight: bold;
-            padding: 8px;
-            border-radius: 8px;
-            text-align: center;
+        .pin-input-small {
+            width: 60px; background: #333; border: 1px solid #444;
+            color: white; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;
         }
 
-        /* --- FORM KONEKSI --- */
-        .connect-box {
-            text-align: left;
-            margin-top: 10px;
-        }
-        .input-full {
-            width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border);
-            color: white; border-radius: 10px; box-sizing: border-box; font-size: 1rem; margin-bottom: 12px;
-            transition: 0.2s;
-        }
-        .input-full:focus { outline: none; border-color: var(--primary); }
+        /* FORM KONEKSI */
+        .input-group { margin-bottom: 15px; text-align: left; }
+        label { font-size: 0.8rem; color: #aaa; display: block; margin-bottom: 5px; }
 
-        .btn-main {
-            width: 100%; padding: 15px; background: var(--primary); color: #000;
-            border: none; border-radius: 10px; font-weight: bold; font-size: 1rem;
-            cursor: pointer; transition: 0.2s; margin-top: 5px;
-            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+        .input-main {
+            width: 100%; padding: 12px; background: #2c2c2c; border: 1px solid #444;
+            color: white; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
         }
-        .btn-main:hover { transform: translateY(-2px); filter: brightness(1.1); }
-        .btn-danger { background: var(--danger); color: white; box-shadow: none; }
+        .input-main:focus { outline: 1px solid var(--primary); }
 
-        /* --- SEND PAGE & LOGS --- */
-        .send-area { display: none; }
-        #log-area {
-            background: #000; text-align: left; padding: 12px;
-            border-radius: 8px; height: 100px; overflow-y: auto;
-            font-family: monospace; font-size: 0.75rem; color: #cbd5e1;
-            margin-top: 25px; border: 1px solid var(--border);
+        .btn-connect {
+            width: 100%; padding: 14px; background: var(--primary); color: #000;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 1rem;
+            cursor: pointer; margin-top: 5px; transition: 0.2s;
         }
-        .dl-link { display: block; background: #064e3b; color: #34d399; padding: 10px; text-decoration: none; border-radius: 6px; margin-top: 5px; text-align: center; font-weight: bold; }
+        .btn-connect:hover { filter: brightness(1.1); }
+        .btn-disconnect { background: var(--danger); color: white; margin-top: 15px; }
+
+        /* AREA KIRIM & LOG */
+        .send-area { display: none; margin-top: 20px; }
+        .log-box {
+            background: #000; text-align: left; padding: 10px;
+            border-radius: 6px; height: 120px; overflow-y: auto;
+            font-family: monospace; font-size: 0.75rem; color: #ccc;
+            margin-top: 20px; border: 1px solid #333;
+        }
+        .dl-link { display: block; background: #1b5e20; color: #fff; padding: 10px; text-decoration: none; border-radius: 6px; margin-top: 5px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>EvanShare <small style="font-size:0.5em; opacity:0.7;">Final</small></h2>
-    <div class="subtitle" id="status-text">Menyiapkan sistem...</div>
+    <h2><i class="fas fa-wifi"></i> EvanShare</h2>
+    <div id="status-text" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;">Initializing...</div>
 
     <div id="page-setup">
-        
-        <div class="id-panel">
-            <span class="label-small">ID SAYA (Bagikan ini ke teman)</span>
-            <span id="my-id" class="my-id-display">...</span>
+        <div class="id-box">
+            <small style="color:#888">ID PERANGKAT INI</small>
+            <span id="my-id" class="my-id-text">...</span>
             
-            <div class="action-row">
-                <button class="btn-copy" onclick="copyId()">
-                    <i class="far fa-copy"></i> Salin ID
-                </button>
+            <div class="tools-row">
+                <button class="btn-small" onclick="copyId()"><i class="far fa-copy"></i> Salin ID</button>
                 
                 <div style="display:flex; align-items:center; gap:5px;">
-                    <span style="font-size:0.8rem; color:#aaa;">PIN SAYA:</span>
-                    <input type="number" id="my-pin-input" class="pin-input" value="1234" title="Ganti PIN Anda disini">
+                    <span style="font-size:0.8rem;">PIN:</span>
+                    <input type="number" id="my-pin" class="pin-input-small" value="1234">
                 </div>
             </div>
         </div>
 
-        <div class="connect-box">
-            <input type="text" id="friend-id" class="input-full" placeholder="Masukkan ID Teman">
-            <input type="number" id="friend-pin" class="input-full" placeholder="Masukkan PIN Teman" value="">
-            <button class="btn-main" onclick="connectToPeer()">
-                SAMBUNGKAN <i class="fas fa-bolt"></i>
-            </button>
+        <div class="input-group">
+            <label>ID TEMAN</label>
+            <input type="text" id="friend-id" class="input-main" placeholder="Contoh: Tiger-88">
         </div>
+        <div class="input-group">
+            <label>PIN TEMAN</label>
+            <input type="number" id="friend-pin" class="input-main" placeholder="Masukkan PIN Teman" value="">
+        </div>
+        
+        <button class="btn-connect" onclick="connectToPeer()">
+            SAMBUNGKAN <i class="fas fa-bolt"></i>
+        </button>
     </div>
 
     <div id="page-send" class="send-area">
-        <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--primary);">
-            <h3 style="margin:0; color:var(--primary);">Terhubung!</h3>
-            <small>Koneksi aman & terenkripsi</small>
+        <div style="background:rgba(0,230,118,0.1); padding:10px; border-radius:8px; border:1px solid var(--primary); margin-bottom:15px;">
+            <b><i class="fas fa-check-circle"></i> Terhubung Aman</b>
         </div>
 
         <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect()">
-        <button class="btn-main" onclick="document.getElementById('file-input').click()">
+        <button class="btn-connect" onclick="document.getElementById('file-input').click()">
             <i class="fas fa-file-upload"></i> PILIH FILE
         </button>
-        <div id="file-status" style="margin-top:10px; font-size:0.9rem; color:#10b981;"></div>
+        <div id="file-status" style="margin-top:10px; color:var(--primary); font-size:0.9rem;"></div>
 
-        <button class="btn-main btn-danger" onclick="location.reload()" style="margin-top:15px;">
-            Putus Koneksi
-        </button>
+        <button class="btn-connect btn-disconnect" onclick="location.reload()">Putus Koneksi</button>
     </div>
 
-    <div id="log-area">
-        <div>System ready.</div>
+    <div id="log-area" class="log-box">
+        <div>> System ready (v.Stable).</div>
     </div>
 </div>
 
 <script>
-    // --- DATABASE KATA ---
+    // --- DATABASE KATA (Logic 6 Des) ---
     const words = ["Tiger", "Eagle", "Panda", "Shark", "Lion", "Mars", "Pluto", "Raptor", "Sonic", "Flash"];
 
-    // --- CONFIG ---
+    // --- CONFIG BASIC (Google STUN Only - Paling Stabil) ---
     const peerConfig = {
         debug: 1,
         config: {
@@ -196,93 +180,103 @@
     let conn = null;
     let myCurrentId = "";
 
-    // Generate ID Random & Start
-    initPeer();
+    // 1. Inisialisasi Sekali Saja (Anti-Crash)
+    startSystem();
 
-    function initPeer() {
-        // Buat ID Random: Word-Number
+    function startSystem() {
+        // Generate ID Random: Tiger-88
         const w = words[Math.floor(Math.random() * words.length)];
         const n = Math.floor(Math.random() * 90) + 10;
         myCurrentId = `${w}-${n}`;
 
+        // Create Peer
         peer = new Peer(myCurrentId, peerConfig);
 
+        // Handler saat ID Ready
         peer.on('open', function(id) {
             document.getElementById('my-id').innerText = id;
-            setStatus("Online. Siap menerima.", "#10b981");
-            log("ID Anda aktif: " + id);
+            setStatus("Online. Siap.", "#00e676");
+            log("ID Aktif: " + id);
         });
 
+        // Handler Error
         peer.on('error', function(err) {
             console.error(err);
-            if(err.type === 'unavailable-id') {
-                // Sangat jarang terjadi karena random, tapi kalau kembar, refresh aja
-                location.reload(); 
+            if (err.type === 'unavailable-id') {
+                location.reload(); // Refresh otomatis kalau ID kembar (Jarang terjadi)
+            } else if (err.type === 'network' || err.type === 'peer-unavailable') {
+                setStatus("Gangguan Jaringan.", "#ff5252");
+                log("Error Jaringan/Firewall.");
             } else {
-                setStatus("Gangguan koneksi.", "#ef4444");
-                log("Error: " + err.type);
+                setStatus("Error: " + err.type, "#ff5252");
             }
         });
 
-        // SAAT ADA TEMAN MASUK (RECEIVER)
+        // Handler Saat Ada Teman Masuk (Receiver)
         peer.on('connection', function(c) {
-            // Ambil PIN yang diset user saat ini
-            const myCurrentPin = document.getElementById('my-pin-input').value;
+            const myPin = document.getElementById('my-pin').value;
             const senderPin = c.metadata ? c.metadata.pin : null;
-            
-            // Cek PIN
-            if (senderPin != myCurrentPin) {
-                c.close();
-                log("Seseorang mencoba masuk, tapi PIN SALAH.", "#ef4444");
+
+            if (senderPin != myPin) {
+                c.close(); // Tolak jika PIN salah
+                log("Koneksi ditolak (PIN Salah).", "#ff5252");
             } else {
                 conn = c;
-                setupConnection();
-                setStatus("Terhubung!", "#10b981");
-                log("Koneksi diterima dari: " + c.peer);
+                setupUIConnection();
+                setStatus("Terhubung!", "#00e676");
+                log("Teman masuk: " + c.peer);
             }
         });
     }
 
-    // --- TOMBOL KONEK (SENDER) ---
+    // 2. Fungsi Connect ke Teman (Sender)
     function connectToPeer() {
         let friendId = document.getElementById('friend-id').value.trim();
         let friendPin = document.getElementById('friend-pin').value.trim();
-        
-        // Auto-fix format ID (ganti spasi jadi strip)
+
+        // Fix format ID
         friendId = friendId.replace(/\s+/g, '-');
 
-        if(!friendId) return alert("Masukkan ID Teman!");
-        if(!friendPin) return alert("Masukkan PIN Teman!");
-        if(friendId === myCurrentId) return alert("Itu ID sendiri!");
+        if (!friendId) return alert("Isi ID Teman!");
+        if (!friendPin) return alert("Isi PIN Teman!");
+        if (friendId === myCurrentId) return alert("Itu ID Sendiri!");
 
-        setStatus("Menghubungi " + friendId + "...", "#f59e0b");
+        setStatus("Menghubungi " + friendId + "...", "#ffd740");
         log("Mencoba konek...");
 
+        // Connect dengan metadata PIN
         conn = peer.connect(friendId, {
             metadata: { pin: friendPin },
-            reliable: true 
+            reliable: true
         });
 
-        conn.on('open', function() { setupConnection(); });
-        
+        conn.on('open', function() {
+            setupUIConnection();
+        });
+
         conn.on('close', function() {
-            alert("Koneksi Ditolak/Putus! (Cek PIN)");
+            alert("Koneksi Ditolak/Putus!");
             location.reload();
         });
+
+        conn.on('error', function(err) {
+            log("Error koneksi: " + err);
+            setStatus("Gagal Konek.", "#ff5252");
+        });
         
-        conn.on('error', function(err) { log("Error konek: " + err); });
-        
-        // Timeout check manual
+        // Timeout Manual
         setTimeout(() => {
-            if(!conn.open) log("Lama.. Pastikan ID benar & Perangkat online.");
+            if(!conn.open) log("Koneksi lambat/timeout. Cek ID lagi.");
         }, 5000);
     }
 
-    function setupConnection() {
+    // 3. Setup UI setelah Konek
+    function setupUIConnection() {
         document.getElementById('page-setup').style.display = 'none';
         document.getElementById('page-send').style.display = 'block';
-        setStatus("Terhubung P2P", "#10b981");
+        setStatus("Terhubung P2P", "#00e676");
 
+        // Handle Terima File
         conn.on('data', function(data) {
             if (data.file) {
                 log("Menerima: " + data.filename);
@@ -294,19 +288,20 @@
         });
     }
 
+    // 4. Handle Kirim File
     function handleFileSelect() {
         const file = document.getElementById('file-input').files[0];
-        if(file) {
-            document.getElementById('file-status').innerText = "Siap kirim: " + file.name;
-            if(confirm("Kirim file " + file.name + "?")) sendFile(file);
+        if (file) {
+            document.getElementById('file-status').innerText = "File: " + file.name;
+            if (confirm("Kirim " + file.name + "?")) sendFile(file);
         }
     }
 
     function sendFile(file) {
-        if(!conn) return alert("Koneksi putus!");
-        log("Mengirim file...", "#f59e0b");
+        if (!conn) return alert("Koneksi putus!");
+        log("Mengirim file...", "#ffd740");
         conn.send({ file: file, filename: file.name, filetype: file.type });
-        log("Berhasil terkirim!", "#10b981");
+        log("Berhasil terkirim!", "#00e676");
         document.getElementById('file-status').innerText = "✅ Terkirim: " + file.name;
     }
 
@@ -320,19 +315,17 @@
     function log(msg, isHtml = false) {
         const area = document.getElementById('log-area');
         const d = document.createElement('div');
-        if(typeof isHtml === 'boolean' && isHtml) d.innerHTML = msg;
+        if (isHtml) d.innerHTML = msg;
         else {
             d.innerText = "> " + msg;
-            if(typeof isHtml === 'string') d.style.color = isHtml;
+            if (typeof isHtml === 'string') d.style.color = isHtml;
         }
         area.prepend(d);
     }
 
     function copyId() {
         const id = document.getElementById('my-id').innerText;
-        navigator.clipboard.writeText(id).then(() => {
-            alert("ID berhasil disalin: " + id);
-        });
+        navigator.clipboard.writeText(id).then(() => alert("ID Disalin: " + id));
     }
 </script>
 
