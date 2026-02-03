@@ -1,0 +1,63 @@
+name: Build APK EvanShare
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Ambil file index.html dari repo agan
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      # 2. Siapkan Node.js & Java (Bahan Bakar)
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # 3. Install Cordova (Alat Pembungkus)
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      # 4. RACIK APLIKASI (Magic Happens Here!)
+      - name: Generate Android Project
+        run: |
+          # Bikin folder project Android baru
+          cordova create app com.evan.share EvanShare
+          
+          # Masuk ke folder app
+          cd app
+          
+          # Tambahkan Platform Android
+          cordova platform add android
+          
+          # HAPUS file bawaan Cordova, GANTI dengan index.html agan
+          rm -rf www/*
+          cp ../index.html www/index.html
+          
+          # (Opsional) Download Logo Agan dan pasang jadi Icon
+          # curl -o www/icon.png https://raw.githubusercontent.com/evanmardiansyah/Local-Sent/main/image_719665.png
+          # (Kalau mau pakai icon, baris di atas tanda pagarnya dihapus)
+
+      # 5. Masak APK (Build)
+      - name: Build APK
+        run: |
+          cd app
+          cordova build android --debug -- --packageType=apk
+
+      # 6. Upload Hasil APK Matang
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: EvanShare-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
