@@ -2,310 +2,397 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EvanShare Stable (Dec 6)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e1f24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>EvanShare App</title>
+    
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Rounded" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* CSS Clean Dark Mode (Versi Stabil) */
+        /* --- MATERIAL YOU THEME SYSTEM --- */
         :root {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --primary: #00e676; 
-            --danger: #ff5252;
-            --text: #ffffff;
-            --border: #333;
+            /* Warna Pastel Material You (Bisa diganti tema lain) */
+            --md-sys-color-background: #191c1a;
+            --md-sys-color-surface: #202522;
+            --md-sys-color-surface-variant: #2d312f;
+            --md-sys-color-primary: #8cf7c8; /* Hijau Pastel */
+            --md-sys-color-on-primary: #003828;
+            --md-sys-color-secondary-container: #354b40;
+            --md-sys-color-on-secondary-container: #d2e8d9;
+            --md-sys-color-error: #ffb4ab;
+            --md-sys-color-outline: #89938d;
+            
+            --border-radius-lg: 28px;
+            --border-radius-md: 16px;
+            --border-radius-sm: 12px;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--md-sys-color-background);
+            color: #e1e3df;
+            font-family: 'Outfit', sans-serif;
             margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center Vertikal */
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden; /* Biar kerasa kaya app */
+        }
+
+        /* --- APP CONTAINER --- */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        /* --- HEADER --- */
+        .app-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .app-title {
+            font-size: 2rem;
+            font-weight: 500;
+            margin: 0;
+            color: var(--md-sys-color-primary);
+            letter-spacing: -0.5px;
+        }
+        .app-subtitle {
+            font-size: 0.9rem;
+            color: var(--md-sys-color-outline);
+        }
+
+        /* --- CARDS (Material You Cards) --- */
+        .m3-card {
+            background-color: var(--md-sys-color-surface);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .m3-card.variant {
+            background-color: var(--md-sys-color-surface-variant);
+        }
+
+        /* --- ID DISPLAY (Big & Bold) --- */
+        .id-display {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--md-sys-color-primary);
+            margin: 10px 0;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .chip {
+            background: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        /* --- INPUT FIELDS (Pill Shape) --- */
+        .input-group {
+            width: 100%;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .input-label {
+            font-size: 0.85rem;
+            color: var(--md-sys-color-primary);
+            margin-left: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .m3-input {
+            width: 100%;
+            background: var(--md-sys-color-surface-variant);
+            border: none;
+            padding: 18px 24px;
+            border-radius: 50px; /* Full Rounded */
+            color: white;
+            font-size: 1rem;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s;
+        }
+        .m3-input:focus {
+            background: #3f4945;
+            box-shadow: 0 0 0 2px var(--md-sys-color-primary);
+        }
+
+        /* --- BUTTONS (FAB & Filled) --- */
+        .btn-primary {
+            width: 100%;
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+            border: none;
+            padding: 18px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background-color: var(--card);
-            width: 90%;
-            max-width: 420px;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        h2 { margin: 0 0 15px 0; color: var(--primary); }
-
-        /* AREA ID SAYA */
-        .id-box {
-            background: #252525;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px dashed #555;
-            margin-bottom: 20px;
-        }
-
-        .my-id-text {
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: var(--primary);
-            display: block;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(0, 230, 118, 0.2);
-        }
-
-        .tools-row {
-            display: flex;
-            justify-content: center;
             gap: 10px;
+            transition: transform 0.2s;
+            margin-top: 10px;
+        }
+        .btn-primary:active { transform: scale(0.96); opacity: 0.9; }
+        
+        .btn-tonal {
+            background: var(--md-sys-color-secondary-container);
+            color: var(--md-sys-color-on-secondary-container);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Tombol & Input Kecil */
-        .btn-small {
-            background: #333; color: #ccc; border: 1px solid #444;
-            padding: 8px 12px; border-radius: 6px; cursor: pointer;
+        .btn-danger {
+            background: var(--md-sys-color-error);
+            color: #690005;
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
         }
-        .btn-small:hover { background: #444; color: white; }
 
-        .pin-input-small {
-            width: 60px; background: #333; border: 1px solid #444;
-            color: white; padding: 8px; border-radius: 6px; text-align: center; font-weight: bold;
+        /* --- UTILS --- */
+        .material-symbols-rounded { font-size: 20px; }
+        .hidden { display: none !important; }
+        
+        /* LOG AREA */
+        .log-sheet {
+            background: black;
+            border-radius: var(--border-radius-md);
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #ccc;
+            height: 100px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #333;
         }
-
-        /* FORM KONEKSI */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { font-size: 0.8rem; color: #aaa; display: block; margin-bottom: 5px; }
-
-        .input-main {
-            width: 100%; padding: 12px; background: #2c2c2c; border: 1px solid #444;
-            color: white; border-radius: 8px; box-sizing: border-box; font-size: 1rem;
+        
+        .download-card {
+            background: #002116;
+            border: 1px solid var(--md-sys-color-primary);
+            color: var(--md-sys-color-primary);
+            padding: 15px;
+            border-radius: var(--border-radius-md);
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
         }
-        .input-main:focus { outline: 1px solid var(--primary); }
-
-        .btn-connect {
-            width: 100%; padding: 14px; background: var(--primary); color: #000;
-            border: none; border-radius: 8px; font-weight: bold; font-size: 1rem;
-            cursor: pointer; margin-top: 5px; transition: 0.2s;
-        }
-        .btn-connect:hover { filter: brightness(1.1); }
-        .btn-disconnect { background: var(--danger); color: white; margin-top: 15px; }
-
-        /* AREA KIRIM & LOG */
-        .send-area { display: none; margin-top: 20px; }
-        .log-box {
-            background: #000; text-align: left; padding: 10px;
-            border-radius: 6px; height: 120px; overflow-y: auto;
-            font-family: monospace; font-size: 0.75rem; color: #ccc;
-            margin-top: 20px; border: 1px solid #333;
-        }
-        .dl-link { display: block; background: #1b5e20; color: #fff; padding: 10px; text-decoration: none; border-radius: 6px; margin-top: 5px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2><i class="fas fa-wifi"></i> EvanShare</h2>
-    <div id="status-text" style="color:#aaa; font-size:0.9rem; margin-bottom:15px;">Initializing...</div>
+<div class="app-container">
+    
+    <div class="app-header">
+        <span class="material-symbols-rounded" style="font-size: 48px; color: var(--md-sys-color-primary);">nearby_share</span>
+        <h1 class="app-title">EvanShare</h1>
+        <div id="status-text" class="app-subtitle">Connecting to server...</div>
+    </div>
 
     <div id="page-setup">
-        <div class="id-box">
-            <small style="color:#888">ID PERANGKAT INI</small>
-            <span id="my-id" class="my-id-text">...</span>
+        <div class="m3-card variant">
+            <span style="font-size:0.8rem; color:var(--md-sys-color-outline); text-transform:uppercase; letter-spacing:1px;">ID Perangkat Ini</span>
+            <div id="my-id" class="id-display">...</div>
             
-            <div class="tools-row">
-                <button class="btn-small" onclick="copyId()"><i class="far fa-copy"></i> Salin ID</button>
-                
-                <div style="display:flex; align-items:center; gap:5px;">
-                    <span style="font-size:0.8rem;">PIN:</span>
-                    <input type="number" id="my-pin" class="pin-input-small" value="1234">
+            <div style="display:flex; gap:10px; margin-top:5px;">
+                <button class="btn-tonal" onclick="copyId()">
+                    <span class="material-symbols-rounded">content_copy</span> Salin
+                </button>
+                <div class="chip">
+                    <span class="material-symbols-rounded">key</span>
+                    <span>PIN:</span>
+                    <input type="number" id="my-pin" value="1234" style="background:transparent; border:none; color:inherit; width:40px; font-weight:bold; font-size:inherit;">
                 </div>
             </div>
         </div>
 
+        <div style="margin-top: 25px;"></div>
+
         <div class="input-group">
-            <label>ID TEMAN</label>
-            <input type="text" id="friend-id" class="input-main" placeholder="Contoh: Tiger-88">
-        </div>
-        <div class="input-group">
-            <label>PIN TEMAN</label>
-            <input type="number" id="friend-pin" class="input-main" placeholder="Masukkan PIN Teman" value="">
+            <label class="input-label">Kirim ke siapa?</label>
+            <input type="text" id="friend-id" class="m3-input" placeholder="Contoh: Tiger-88">
         </div>
         
-        <button class="btn-connect" onclick="connectToPeer()">
-            SAMBUNGKAN <i class="fas fa-bolt"></i>
-        </button>
-    </div>
-
-    <div id="page-send" class="send-area">
-        <div style="background:rgba(0,230,118,0.1); padding:10px; border-radius:8px; border:1px solid var(--primary); margin-bottom:15px;">
-            <b><i class="fas fa-check-circle"></i> Terhubung Aman</b>
+        <div class="input-group">
+            <label class="input-label">PIN Keamanan Teman</label>
+            <input type="number" id="friend-pin" class="m3-input" placeholder="Default: 1234">
         </div>
 
-        <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect()">
-        <button class="btn-connect" onclick="document.getElementById('file-input').click()">
-            <i class="fas fa-file-upload"></i> PILIH FILE
+        <button class="btn-primary" onclick="connectToPeer()">
+            SAMBUNGKAN
+            <span class="material-symbols-rounded">arrow_forward</span>
         </button>
-        <div id="file-status" style="margin-top:10px; color:var(--primary); font-size:0.9rem;"></div>
-
-        <button class="btn-connect btn-disconnect" onclick="location.reload()">Putus Koneksi</button>
     </div>
 
-    <div id="log-area" class="log-box">
-        <div>> System ready (v.Stable).</div>
+    <div id="page-send" class="hidden">
+        <div class="m3-card" style="background:#003828; color:#8cf7c8;">
+            <span class="material-symbols-rounded" style="font-size:40px;">lock_person</span>
+            <h2 style="margin:10px 0 0 0;">Terhubung Aman</h2>
+            <p style="opacity:0.8; font-size:0.9rem; margin:5px 0 0 0;">Enkripsi End-to-End Aktif</p>
+        </div>
+
+        <div style="margin-top:30px;">
+            <input type="file" id="file-input" class="hidden" onchange="handleFileSelect()">
+            
+            <button class="btn-primary" onclick="document.getElementById('file-input').click()" style="height: 80px;">
+                <span class="material-symbols-rounded">upload_file</span>
+                PILIH FILE
+            </button>
+            
+            <div id="file-status" style="text-align:center; margin-top:15px; color:var(--md-sys-color-primary);"></div>
+        </div>
+
+        <button class="btn-danger" onclick="location.reload()">
+            PUTUS KONEKSI
+        </button>
     </div>
+
+    <div id="log-area" class="log-sheet">
+        > App Ready (Material You UI).
+    </div>
+
 </div>
 
 <script>
-    // --- DATABASE KATA (Logic 6 Des) ---
+    // --- LOGIC STABIL (6 Des) ---
     const words = ["Tiger", "Eagle", "Panda", "Shark", "Lion", "Mars", "Pluto", "Raptor", "Sonic", "Flash"];
 
-    // --- CONFIG BASIC (Google STUN Only - Paling Stabil) ---
     const peerConfig = {
         debug: 1,
-        config: {
-            'iceServers': [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' }
-            ]
-        }
+        config: { 'iceServers': [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] }
     };
 
     let peer = null;
     let conn = null;
     let myCurrentId = "";
 
-    // 1. Inisialisasi Sekali Saja (Anti-Crash)
     startSystem();
 
     function startSystem() {
-        // Generate ID Random: Tiger-88
         const w = words[Math.floor(Math.random() * words.length)];
         const n = Math.floor(Math.random() * 90) + 10;
         myCurrentId = `${w}-${n}`;
 
-        // Create Peer
         peer = new Peer(myCurrentId, peerConfig);
 
-        // Handler saat ID Ready
         peer.on('open', function(id) {
             document.getElementById('my-id').innerText = id;
-            setStatus("Online. Siap.", "#00e676");
+            setStatus("Online & Siap.", "var(--md-sys-color-primary)");
             log("ID Aktif: " + id);
         });
 
-        // Handler Error
         peer.on('error', function(err) {
-            console.error(err);
-            if (err.type === 'unavailable-id') {
-                location.reload(); // Refresh otomatis kalau ID kembar (Jarang terjadi)
-            } else if (err.type === 'network' || err.type === 'peer-unavailable') {
-                setStatus("Gangguan Jaringan.", "#ff5252");
-                log("Error Jaringan/Firewall.");
-            } else {
-                setStatus("Error: " + err.type, "#ff5252");
-            }
+            if (err.type === 'unavailable-id') location.reload();
+            else setStatus("Gangguan Jaringan.", "var(--md-sys-color-error)");
         });
 
-        // Handler Saat Ada Teman Masuk (Receiver)
         peer.on('connection', function(c) {
             const myPin = document.getElementById('my-pin').value;
             const senderPin = c.metadata ? c.metadata.pin : null;
 
             if (senderPin != myPin) {
-                c.close(); // Tolak jika PIN salah
-                log("Koneksi ditolak (PIN Salah).", "#ff5252");
+                c.close();
+                log("PIN Salah - Koneksi Ditolak");
             } else {
                 conn = c;
                 setupUIConnection();
-                setStatus("Terhubung!", "#00e676");
                 log("Teman masuk: " + c.peer);
             }
         });
     }
 
-    // 2. Fungsi Connect ke Teman (Sender)
     function connectToPeer() {
-        let friendId = document.getElementById('friend-id').value.trim();
+        let friendId = document.getElementById('friend-id').value.trim().replace(/\s+/g, '-');
         let friendPin = document.getElementById('friend-pin').value.trim();
 
-        // Fix format ID
-        friendId = friendId.replace(/\s+/g, '-');
+        if (!friendId || !friendPin) return alert("Lengkapi ID dan PIN!");
+        if (friendId === myCurrentId) return alert("Itu ID sendiri!");
 
-        if (!friendId) return alert("Isi ID Teman!");
-        if (!friendPin) return alert("Isi PIN Teman!");
-        if (friendId === myCurrentId) return alert("Itu ID Sendiri!");
-
-        setStatus("Menghubungi " + friendId + "...", "#ffd740");
-        log("Mencoba konek...");
-
-        // Connect dengan metadata PIN
+        setStatus("Menghubungi...", "#ffd740");
+        
         conn = peer.connect(friendId, {
             metadata: { pin: friendPin },
             reliable: true
         });
 
-        conn.on('open', function() {
-            setupUIConnection();
-        });
-
-        conn.on('close', function() {
-            alert("Koneksi Ditolak/Putus!");
-            location.reload();
-        });
-
-        conn.on('error', function(err) {
-            log("Error koneksi: " + err);
-            setStatus("Gagal Konek.", "#ff5252");
-        });
+        conn.on('open', function() { setupUIConnection(); });
+        conn.on('close', function() { alert("Koneksi Putus!"); location.reload(); });
+        conn.on('error', function(err) { log("Error: " + err); });
         
-        // Timeout Manual
-        setTimeout(() => {
-            if(!conn.open) log("Koneksi lambat/timeout. Cek ID lagi.");
-        }, 5000);
+        setTimeout(() => { if(!conn.open) log("Timeout/Lama..."); }, 5000);
     }
 
-    // 3. Setup UI setelah Konek
     function setupUIConnection() {
-        document.getElementById('page-setup').style.display = 'none';
-        document.getElementById('page-send').style.display = 'block';
-        setStatus("Terhubung P2P", "#00e676");
+        document.getElementById('page-setup').classList.add('hidden');
+        document.getElementById('page-send').classList.remove('hidden');
+        setStatus("Terhubung P2P", "var(--md-sys-color-primary)");
 
-        // Handle Terima File
         conn.on('data', function(data) {
             if (data.file) {
                 log("Menerima: " + data.filename);
                 const blob = new Blob([data.file], { type: data.filetype });
                 const url = URL.createObjectURL(blob);
-                const link = `<a href="${url}" download="${data.filename}" class="dl-link"><i class="fas fa-download"></i> DOWNLOAD: ${data.filename}</a>`;
+                const link = `<a href="${url}" download="${data.filename}" class="download-card"><span class="material-symbols-rounded" style="vertical-align:middle">download</span> DOWNLOAD: ${data.filename}</a>`;
                 log(link, true);
             }
         });
     }
 
-    // 4. Handle Kirim File
     function handleFileSelect() {
         const file = document.getElementById('file-input').files[0];
         if (file) {
-            document.getElementById('file-status').innerText = "File: " + file.name;
+            document.getElementById('file-status').innerText = "Siap kirim: " + file.name;
             if (confirm("Kirim " + file.name + "?")) sendFile(file);
         }
     }
 
     function sendFile(file) {
-        if (!conn) return alert("Koneksi putus!");
-        log("Mengirim file...", "#ffd740");
+        if (!conn) return alert("Putus!");
         conn.send({ file: file, filename: file.name, filetype: file.type });
-        log("Berhasil terkirim!", "#00e676");
+        log("Terkirim!");
         document.getElementById('file-status').innerText = "✅ Terkirim: " + file.name;
     }
 
-    // --- UTILS ---
     function setStatus(msg, color) {
         const el = document.getElementById('status-text');
         el.innerText = msg;
@@ -315,17 +402,13 @@
     function log(msg, isHtml = false) {
         const area = document.getElementById('log-area');
         const d = document.createElement('div');
-        if (isHtml) d.innerHTML = msg;
-        else {
-            d.innerText = "> " + msg;
-            if (typeof isHtml === 'string') d.style.color = isHtml;
-        }
+        if (isHtml) d.innerHTML = msg; else d.innerText = "> " + msg;
         area.prepend(d);
     }
 
     function copyId() {
         const id = document.getElementById('my-id').innerText;
-        navigator.clipboard.writeText(id).then(() => alert("ID Disalin: " + id));
+        navigator.clipboard.writeText(id).then(() => alert("ID Disalin"));
     }
 </script>
 
